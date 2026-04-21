@@ -1,0 +1,14 @@
+{
+  "name": "ai-etl-data-marketplace",
+  "owner": {
+    "name": "Andrey Suvorov",
+    "email": "andrey_suvorov@intuit.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-etl-data",
+      "source": ".",
+      "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification."
+    }
+  ]
+}
