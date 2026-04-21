@@ -7,7 +7,10 @@
   "plugins": [
     {
       "name": "ai-etl-data",
-      "source": ".",
+      "source": {
+        "source": "url",
+        "url": "git@github.intuit.com:RiskDataAnalytics/ai-etl-data-plugin.git"
+      },
       "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification."
     }
   ]

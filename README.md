@@ -4,41 +4,49 @@ End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the fu
 
 ## Install
 
-Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps:
+Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps.
 
-**1. Register the marketplace** (once per machine):
+### Prerequisites: SSH access to Intuit GitHub Enterprise
 
-```bash
-/plugin marketplace add RiskDataAnalytics/ai-etl-data-plugin
-```
-
-If Claude Code can't resolve the short form against GitHub Enterprise, use the full HTTPS URL:
+Claude Code's `owner/repo` shorthand resolves to `github.com`, which won't work for Enterprise-hosted repos. You must use the full SSH URL, and your SSH key must be registered with `github.intuit.com` and its host key present in `known_hosts`:
 
 ```bash
-/plugin marketplace add https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin
+# One-time: add github.intuit.com to known_hosts
+ssh-keyscan -t rsa,ecdsa,ed25519 github.intuit.com >> ~/.ssh/known_hosts
+
+# Verify SSH auth works
+ssh -T git@github.intuit.com
 ```
 
-**2. Install the plugin:**
+### 1. Register the marketplace (once per machine)
+
+```bash
+/plugin marketplace add git@github.intuit.com:RiskDataAnalytics/ai-etl-data-plugin.git
+```
+
+> **Note:** The short form (`RiskDataAnalytics/ai-etl-data-plugin`) and the plain HTTPS URL (`https://github.intuit.com/...`) both fail against Enterprise GitHub — the first resolves to `github.com`, the second returns HTML instead of the marketplace JSON. Use the full SSH clone URL above.
+
+### 2. Install the plugin
 
 ```bash
 /plugin install ai-etl-data@ai-etl-data-marketplace
 ```
 
-**Verify:**
+### Verify
 
 ```bash
 /plugin marketplace list
 /plugin list
 ```
 
-**Update later:**
+### Update later
 
 ```bash
 /plugin marketplace update ai-etl-data-marketplace
 /plugin install ai-etl-data@ai-etl-data-marketplace
 ```
 
-**Uninstall:**
+### Uninstall
 
 ```bash
 /plugin uninstall ai-etl-data
