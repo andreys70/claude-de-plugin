@@ -142,6 +142,14 @@ Then invoke `data-issue-validator` against the stable table.
 ### Phase 9 — Close-out
 Invoke `jira-commenter` to post both validation results (PRF and stable) to the Jira ticket. Optionally offer the CR-format summary if not already posted.
 
+After the verification comment posts successfully, ask:
+
+> "Close `<TICKET>` now? I'll pull the available transitions and you pick the terminal status (`Done` / `Resolved` / `Closed` / whichever your workflow uses). (yes / skip)"
+
+On **yes**, re-invoke `jira-commenter` with the transition request — it handles `get_available_transitions` + the pick + the transition call, always gated by explicit engineer approval inside the sub-agent. Include the final ticket status in the recap.
+
+On **skip**, leave the ticket in its current status and note it in the recap.
+
 ## Behavioral rules
 
 **Scope creep** (per `guardrails.md`): if diagnosis uncovers a second, unrelated bug, note it and stay on the primary ticket. After primary fix, ask: "Also found X — open a separate Jira ticket?"
@@ -168,10 +176,10 @@ Use `TaskCreate` / `TaskUpdate` to surface progress:
 7. PRF validation (→ Checkpoint 3)
 8. PRD pipeline execution (BPP)
 9. Post-deploy (stable) verification
-10. Close-out (Jira update)
+10. Close-out (Jira verification comment + optional ticket transition)
 
 Mark in-progress when starting, completed when done. Drop tasks the engineer explicitly skipped.
 
 ## Final output
 
-≤7-line recap: ticket, fix SHA, PR URL, PRF execution + validation outcome, PRD pipeline execution outcome (or "skipped by engineer"), stable verification outcome, any skips or unresolved issues.
+≤7-line recap: ticket (+ final status if transitioned), fix SHA, PR URL, PRF execution + validation outcome, PRD pipeline execution outcome (or "skipped by engineer"), stable verification outcome, any skips or unresolved issues.
