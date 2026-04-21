@@ -50,6 +50,28 @@ Invoke `data-issue-diagnoser` with the intake report.
 
 Honor "skip checkpoint" if explicit, but note in your response that you proceeded unreviewed.
 
+### Phase 3a — Working branch (before any file edits)
+
+Before invoking the coder, ensure the engineer is on a working branch — not a protected one — so the upcoming edits don't land on `main` / `master` / `develop`.
+
+Run `git branch --show-current`. Then:
+
+- **If current branch is protected** (`main`, `master`, `develop`) **OR does not contain the Jira key**, ask:
+
+  > "You're on `<current-branch>`. Cut a new working branch before I make edits?
+  >
+  > Suggested: `feature/<JIRA-KEY>`
+  >
+  > (yes / stay on `<current-branch>` / custom name)"
+
+  On `yes` or a custom name, run `git checkout -b <name>`. Uncommitted changes (if any) carry forward automatically — no stash needed.
+
+  On `stay`: refuse if the branch is protected and re-prompt. Otherwise proceed, but note the unusual branch choice in the final recap.
+
+- **If current branch already matches** `feature/<JIRA-KEY>` or an obvious variant, proceed silently.
+
+This step is a hard gate against committing to protected branches — `git-release-agent` will refuse in Phase 4 anyway, but doing it here means the coder's edits start on the right branch.
+
 ### Phase 3 — Code fix
 Invoke `data-issue-fixer-coder` with the approved diagnosis.
 
@@ -139,13 +161,14 @@ An engineer may invoke any sub-agent directly (e.g., `Agent(data-issue-diagnoser
 Use `TaskCreate` / `TaskUpdate` to surface progress:
 1. Intake
 2. Diagnosis (→ Checkpoint 1)
-3. Code fix (→ Checkpoint 2)
-4. Commit / Push / PR
-5. PRF pipeline execution (pre-prod)
-6. PRF validation (→ Checkpoint 3)
-7. PRD pipeline execution (BPP)
-8. Post-deploy (stable) verification
-9. Close-out (Jira update)
+3. Working branch (Phase 3a — cut `feature/<JIRA-KEY>` if on protected branch)
+4. Code fix (→ Checkpoint 2)
+5. Commit / Push / PR
+6. PRF pipeline execution (pre-prod)
+7. PRF validation (→ Checkpoint 3)
+8. PRD pipeline execution (BPP)
+9. Post-deploy (stable) verification
+10. Close-out (Jira update)
 
 Mark in-progress when starting, completed when done. Drop tasks the engineer explicitly skipped.
 
