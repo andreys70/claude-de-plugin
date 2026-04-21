@@ -6,18 +6,6 @@ End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the fu
 
 Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps.
 
-### Prerequisites: SSH access to Intuit GitHub Enterprise
-
-Claude Code's `owner/repo` shorthand resolves to `github.com`, which won't work for Enterprise-hosted repos. You must use the full SSH URL, and your SSH key must be registered with `github.intuit.com` and its host key present in `known_hosts`:
-
-```bash
-# One-time: add github.intuit.com to known_hosts
-ssh-keyscan -t rsa,ecdsa,ed25519 github.intuit.com >> ~/.ssh/known_hosts
-
-# Verify SSH auth works
-ssh -T git@github.intuit.com
-```
-
 ### 1. Register the marketplace (once per machine)
 
 ```bash
