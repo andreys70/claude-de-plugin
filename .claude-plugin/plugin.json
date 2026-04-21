@@ -1,0 +1,19 @@
+{
+  "name": "etl-data",
+  "version": "0.1.0",
+  "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification.",
+  "author": {
+    "name": "Andrey Suvorov",
+    "email": "andrey_suvorov@intuit.com"
+  },
+  "homepage": "https://github.intuit.com/RiskDataAnalytics/etl-data-plugin",
+  "repository": "https://github.intuit.com/RiskDataAnalytics/etl-data-plugin",
+  "keywords": [
+    "etl",
+    "data-pipeline",
+    "diagnostics",
+    "jira",
+    "bpp",
+    "databricks"
+  ]
+}
