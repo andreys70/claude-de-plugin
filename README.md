@@ -1,4 +1,4 @@
-# etl-data — Claude Code plugin
+# ai-etl-data — Claude Code plugin
 
 End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the full cycle (Jira intake → diagnosis → code fix → PRF validation → BPP pipeline → post-deploy verification → Jira close-out) via an orchestrator plus specialist sub-agents, with engineer approval at three checkpoints.
 
@@ -7,27 +7,27 @@ End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the fu
 **From this GitHub Enterprise repo:**
 
 ```bash
-/plugin install https://github.intuit.com/RiskDataAnalytics/etl-data-plugin
+/plugin install https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin
 ```
 
 **Local development (before pushing updates):**
 
 ```bash
-claude --plugin-dir ~/Documents/GitHub/etl-data-plugin
+claude --plugin-dir ~/Documents/GitHub/ai-etl-data-plugin
 ```
 
 ## Use
 
 ```
-/etl-data:data-issue-fix FIND-599
+/ai-etl-data:data-issue-fix JIRA-XXXX
 ```
 
 Or invoke any specialist sub-agent directly:
 
 ```
-Agent(etl-data:data-issue-diagnoser, "why is last_routing_number 97% NULL since Dec 2025?")
-Agent(etl-data:bpp-pipeline-runner, "run pipeline for FIND-599")
-Agent(etl-data:data-issue-validator, "verify FIND-599 on risk_analytics_stable_prf.ips_transactions_check_new after commit 6875fe0a")
+Agent(ai-etl-data:data-issue-diagnoser, "why is last_routing_number 97% NULL since Dec 2025?")
+Agent(ai-etl-data:bpp-pipeline-runner, "run pipeline for JIRA-XXXX")
+Agent(ai-etl-data:data-issue-validator, "verify JIRA-XXXX on schema_name.table_name after commit <commit-sha>")
 ```
 
 ## Required MCPs
@@ -45,7 +45,7 @@ The orchestrator runs nine phases. Three checkpoints (post-diagnosis, pre-commit
 
 ```mermaid
 flowchart TD
-    Start([/data-issue-fix FIND-XXX/])
+    Start([/data-issue-fix JIRA-XXX/])
     Start --> MCPCheck{MCPs connected?<br/>databricks-mcp, jira-mcp,<br/>DAST-Orch, intuit-github-mcp}
     MCPCheck -->|missing| FailFast[/Stop, tell engineer<br/>which MCP to reconnect/]
     MCPCheck -->|all present| P1
@@ -174,7 +174,7 @@ data-issue-patterns/
 ├── SKILL.md
 ├── refs/
 │   ├── diagnostic-method.md    ← the rule-out pattern
-│   ├── worked-examples.md      ← FIND-599 patterns (bridges, control groups, red herrings)
+│   ├── worked-examples.md      ← JIRA-XXXX patterns (bridges, control groups, red herrings)
 │   └── guardrails.md           ← approval policy, checkpoints, non-negotiables
 ├── templates/
 │   ├── intake-report.md
@@ -235,9 +235,9 @@ The orchestrator reads `CLAUDE.md` (project root, parent dirs, `~/CLAUDE.md`) fo
 ## Example session
 
 ```
-> /data-issue-fix FIND-599
+> /data-issue-fix JIRA-XXXX
 
-[Phase 1] Reading FIND-599... 4 comments. Last comment retracted
+[Phase 1] Reading JIRA-XXXX... 4 comments. Last comment retracted
 Payments 2.0 UNION approach. Currently awaiting validation of a
 parallel-join fix using mt_txn_id.
 
@@ -303,7 +303,7 @@ across Feb–Apr 2026. Row count parity: diff = 0. Spot-check: 10/10.
 
 [jira-commenter posted comment 15291782]
 
-Recap: FIND-599 fixed (SHA 6875fe0a). PR #742 merged. PRF validated,
+Recap: JIRA-XXXX fixed (SHA 6875fe0a). PR #742 merged. PRF validated,
 PRD pipeline succeeded. NULL% baseline restored in stable. Jira updated.
 ```
 
