@@ -135,13 +135,17 @@ flowchart TD
 
     P8[Phase 8: Post-deploy verification<br/>stable table, 5 standard checks]
     P8 --> P9[Phase 9: Close-out<br/>post PRF + stable results to Jira]
-    P9 --> Done([recap: SHA, PR, PRF outcome,<br/>PRD pipeline, stable verification])
+    P9 --> CloseGate{close ticket?}
+    CloseGate -->|yes| Transition[jira-commenter<br/>transition to Done/Resolved/Closed]
+    CloseGate -->|skip| Done
+    Transition --> Done([recap: ticket status, SHA, PR,<br/>PRF outcome, PRD pipeline,<br/>stable verification])
 
     style CP1 fill:#fff4cc
     style CP2 fill:#fff4cc
     style CP3 fill:#fff4cc
     style MergeConfirm fill:#fff4cc
     style PipeResult fill:#fff4cc
+    style CloseGate fill:#fff4cc
     style PRFGate fill:#ffcccc
     style StableGate fill:#ffcccc
     style MCPCheck fill:#ffcccc
@@ -208,7 +212,7 @@ Isolated workflow executors. Each runs in a fresh conversation context.
 - `data-issue-fixer-coder` — implements code fix
 - `bpp-pipeline-runner` — executes BPP pipeline post-merge
 - `data-issue-validator` — post-deploy verification
-- `jira-commenter` — posts Jira comments
+- `jira-commenter` — posts Jira comments; optionally transitions the ticket to a terminal status
 - `git-release-agent` — commit / push / PR
 - `incident-scribe` — structures raw incident reports
 
@@ -243,7 +247,7 @@ data-issue-patterns/
 | `data-issue-fixer-coder` | Read, Edit, Write, Grep, Glob, Bash | edits files, no commit |
 | `bpp-pipeline-runner` | Read, ScheduleWakeup | BPP only, with approval |
 | `data-issue-validator` | Read, Bash | no |
-| `jira-commenter` | Read | Jira only, with approval |
+| `jira-commenter` | Read | Jira comments + ticket transitions, with approval |
 | `git-release-agent` | Bash, Read | git only, with approval |
 | `incident-scribe` | Read, Grep, Glob | Jira only, with approval |
 
@@ -349,8 +353,13 @@ across Feb–Apr 2026. Row count parity: diff = 0. Spot-check: 10/10.
 
 [jira-commenter posted comment 15291782]
 
-Recap: JIRA-XXXX fixed (SHA 6875fe0a). PR #742 merged. PRF validated,
-PRD pipeline succeeded. NULL% baseline restored in stable. Jira updated.
+Close JIRA-XXXX now? Available transitions: `Done`, `Cancelled`. (yes / skip)
+> yes, Done
+
+[transitioned JIRA-XXXX → Done]
+
+Recap: JIRA-XXXX fixed (SHA 6875fe0a), status Done. PR #742 merged.
+PRF validated, PRD pipeline succeeded. NULL% baseline restored in stable.
 ```
 
 ## Why this layout
