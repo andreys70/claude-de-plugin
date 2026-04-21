@@ -80,7 +80,7 @@ The orchestrator fails fast if any of these are not connected:
 
 ## Workflow diagram
 
-The orchestrator runs nine phases. Three checkpoints (post-diagnosis, pre-commit, post-PRF-validation) gate on engineer approval. Destructive actions (Jira posts, git commits, git push, PR creation, BPP execution) always require explicit approval even inside an approved checkpoint.
+The orchestrator runs nine phases plus a working-branch pre-flight (Phase 3a). Three checkpoints (post-diagnosis, pre-commit, post-PRF-validation) gate on engineer approval. Destructive actions (Jira posts, git commits, git push, PR creation, BPP execution) always require explicit approval even inside an approved checkpoint.
 
 ```mermaid
 flowchart TD
@@ -94,7 +94,13 @@ flowchart TD
     P2 --> CP1{Checkpoint 1<br/>review diagnosis?}
     CP1 -->|refine| P2
     CP1 -->|stop| End1([stop])
-    CP1 -->|yes| P3
+    CP1 -->|yes| P3a
+
+    P3a[Phase 3a: Working branch<br/>cut feature/JIRA-KEY if on protected branch]
+    P3a --> BranchGate{on protected branch<br/>or name mismatch?}
+    BranchGate -->|yes| AskCheckout[/ask: cut new branch?/]
+    AskCheckout --> P3
+    BranchGate -->|no| P3
 
     P3[Phase 3: Code fix<br/>minimal diff, local validation]
     P3 --> CP2{Checkpoint 2<br/>review diff?}
@@ -139,6 +145,7 @@ flowchart TD
     style PRFGate fill:#ffcccc
     style StableGate fill:#ffcccc
     style MCPCheck fill:#ffcccc
+    style BranchGate fill:#fff4cc
 ```
 
 **Legend:** yellow = engineer-gated decision; red = hard gate / fail-fast check.
