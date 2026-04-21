@@ -6,15 +6,13 @@ End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the fu
 
 Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps.
 
-### 1. Register the marketplace (once per machine)
+### Register the marketplace (once per machine)
 
 ```bash
 /plugin marketplace add git@github.intuit.com:RiskDataAnalytics/ai-etl-data-plugin.git
 ```
 
-> **Note:** The short form (`RiskDataAnalytics/ai-etl-data-plugin`) and the plain HTTPS URL (`https://github.intuit.com/...`) both fail against Enterprise GitHub — the first resolves to `github.com`, the second returns HTML instead of the marketplace JSON. Use the full SSH clone URL above.
-
-### 2. Install the plugin
+### Install the plugin
 
 ```bash
 /plugin install ai-etl-data@ai-etl-data-marketplace
