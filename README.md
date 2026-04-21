@@ -4,17 +4,62 @@ End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the fu
 
 ## Install
 
-**From this GitHub Enterprise repo:**
+Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps:
+
+**1. Register the marketplace** (once per machine):
 
 ```bash
-/plugin install https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin
+/plugin marketplace add RiskDataAnalytics/ai-etl-data-plugin
 ```
 
-**Local development (before pushing updates):**
+If Claude Code can't resolve the short form against GitHub Enterprise, use the full HTTPS URL:
 
 ```bash
-claude --plugin-dir ~/Documents/GitHub/ai-etl-data-plugin
+/plugin marketplace add https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin
 ```
+
+**2. Install the plugin:**
+
+```bash
+/plugin install ai-etl-data@ai-etl-data-marketplace
+```
+
+**Verify:**
+
+```bash
+/plugin marketplace list
+/plugin list
+```
+
+**Update later:**
+
+```bash
+/plugin marketplace update ai-etl-data-marketplace
+/plugin install ai-etl-data@ai-etl-data-marketplace
+```
+
+**Uninstall:**
+
+```bash
+/plugin uninstall ai-etl-data
+/plugin marketplace remove ai-etl-data-marketplace
+```
+
+### Local development
+
+When iterating on the plugin before pushing, point Claude Code at your local checkout instead of the GHE repo:
+
+```bash
+/plugin marketplace add ~/Documents/GitHub/ai-etl-data-plugin
+/plugin install ai-etl-data@ai-etl-data-marketplace
+```
+
+Changes to agent/skill files in the checkout are picked up on the next Claude Code session (no reinstall needed). If you edit `.claude-plugin/plugin.json` or `marketplace.json`, run `/plugin marketplace update ai-etl-data-marketplace` to refresh.
+
+### Prerequisites
+
+- `gh` CLI authenticated against `github.intuit.com` (`gh auth status --hostname github.intuit.com`)
+- All [required MCPs](#required-mcps) connected — the orchestrator fails fast if any are missing
 
 ## Use
 
