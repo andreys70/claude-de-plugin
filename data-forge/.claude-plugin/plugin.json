@@ -1,13 +1,13 @@
 {
-  "name": "ai-etl-data",
-  "version": "0.1.1",
+  "name": "data-forge",
+  "version": "0.2.0",
   "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification.",
   "author": {
     "name": "Andrey Suvorov",
     "email": "andrey_suvorov@intuit.com"
   },
-  "homepage": "https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin",
-  "repository": "https://github.intuit.com/RiskDataAnalytics/ai-etl-data-plugin",
+  "homepage": "https://github.intuit.com/RiskDataAnalytics/claude-de-plugins",
+  "repository": "https://github.intuit.com/RiskDataAnalytics/claude-de-plugins",
   "keywords": [
     "etl",
     "data-pipeline",
