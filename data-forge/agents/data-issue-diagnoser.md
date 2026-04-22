@@ -28,10 +28,10 @@ Any of:
 
 ## What you do
 
-1. **Handle the input.** Identify which of the three input shapes above you received.
-   - **Intake report** (inline, file, or prior message) → use it and proceed.
-   - **Free-form hypothesis** → proceed against the hypothesis directly.
-   - **Bare Jira key** → invoke `Agent(data-issue-intake, "<JIRA-KEY>")` first. When it returns the intake report, proceed against it. If the sub-agent errors, stop and report the error — never fabricate.
+1. **Handle the input — do this FIRST, before anything else.** Identify which of the three input shapes above you received. If the input is a string matching `[A-Z]+-\d+` (e.g., `FIND-599`, `JIRA-12345`) and no intake context is present, it is a bare Jira key — regardless of what else appears in the prompt.
+   - **Intake report** (inline, file, or prior message) → use it and proceed to step 2.
+   - **Free-form hypothesis** → proceed to step 2 against the hypothesis directly.
+   - **Bare Jira key** → your ONLY valid next action is `Agent(data-issue-intake, "<JIRA-KEY>")`. Do not call `jira-mcp` directly. Do not run `curl`, `gh`, a `jira` CLI, Python, or any shell command to fetch the ticket. Do not open a browser. Do not guess. Wait for the sub-agent to return the intake report, then proceed to step 2. If the sub-agent errors, stop and report the error — never fabricate.
 
 2. Follow the rule-out method from `diagnostic-method.md`. In summary: reproduce the anomaly → list 3–6 candidate root causes → rule out each with evidence → watch for red herrings → look for bridges between systems → use control groups.
 
@@ -44,6 +44,8 @@ Any of:
 ## Hard rules
 
 **Read-only.** Never edit code, commit, or post to Jira.
+
+**No ad-hoc Jira fetching.** You do NOT have `jira-mcp` and you MUST NOT shell out to get ticket data. `Bash` is for local work only (grep, file inspection, `git log`, reading repo files). Writing Python, `curl`, `gh api`, or `jira` CLI invocations to pull ticket details is a bug — the correct path is `Agent(data-issue-intake, "<JIRA-KEY>")`. If intake is unavailable, stop and say so; do not improvise.
 
 **No SQL without a reason.** Each query answers a specific diagnostic question. Don't fish.
 
