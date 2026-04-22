@@ -1,16 +1,17 @@
 {
-  "name": "ai-etl-data-marketplace",
+  "name": "intuit-de",
   "owner": {
     "name": "Andrey Suvorov",
     "email": "andrey_suvorov@intuit.com"
   },
   "plugins": [
     {
-      "name": "ai-etl-data",
+      "name": "data-forge",
       "source": {
         "source": "url",
-        "url": "git@github.intuit.com:RiskDataAnalytics/ai-etl-data-plugin.git"
+        "url": "git@github.intuit.com:RiskDataAnalytics/claude-de-plugins.git"
       },
+      "path": "data-forge",
       "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification."
     }
   ]

@@ -1,6 +1,8 @@
-# ai-etl-data — Claude Code plugin
+# data-forge — Claude Code plugin
 
 End-to-end resolution of data-issue Jira tickets in ETL codebases. Drives the full cycle (Jira intake → diagnosis → code fix → PRF validation → BPP pipeline → post-deploy verification → Jira close-out) via an orchestrator plus specialist sub-agents, with engineer approval at three checkpoints.
+
+Ships from the `intuit-de` marketplace (this repo), which may grow to host additional data-engineering plugins over time. The plugin itself lives at `data-forge/` inside the repo.
 
 ## Install
 
@@ -9,13 +11,13 @@ Claude Code installs plugins from **marketplaces**, not directly from plugin rep
 ### Register the marketplace (once per machine)
 
 ```bash
-/plugin marketplace add git@github.intuit.com:RiskDataAnalytics/ai-etl-data-plugin.git
+/plugin marketplace add git@github.intuit.com:RiskDataAnalytics/claude-de-plugins.git
 ```
 
 ### Install the plugin
 
 ```bash
-/plugin install ai-etl-data@ai-etl-data-marketplace
+/plugin install data-forge@intuit-de
 ```
 
 ### Verify
@@ -28,15 +30,15 @@ Claude Code installs plugins from **marketplaces**, not directly from plugin rep
 ### Update later
 
 ```bash
-/plugin marketplace update ai-etl-data-marketplace
-/plugin install ai-etl-data@ai-etl-data-marketplace
+/plugin marketplace update intuit-de
+/plugin install data-forge@intuit-de
 ```
 
 ### Uninstall
 
 ```bash
-/plugin uninstall ai-etl-data
-/plugin marketplace remove ai-etl-data-marketplace
+/plugin uninstall data-forge
+/plugin marketplace remove intuit-de
 ```
 
 ### Local development
@@ -44,11 +46,11 @@ Claude Code installs plugins from **marketplaces**, not directly from plugin rep
 When iterating on the plugin before pushing, point Claude Code at your local checkout instead of the GHE repo:
 
 ```bash
-/plugin marketplace add ~/Documents/GitHub/ai-etl-data-plugin
-/plugin install ai-etl-data@ai-etl-data-marketplace
+/plugin marketplace add ~/Documents/GitHub/claude-de-plugins
+/plugin install data-forge@intuit-de
 ```
 
-Changes to agent/skill files in the checkout are picked up on the next Claude Code session (no reinstall needed). If you edit `.claude-plugin/plugin.json` or `marketplace.json`, run `/plugin marketplace update ai-etl-data-marketplace` to refresh.
+Changes to agent/skill files in the checkout are picked up on the next Claude Code session (no reinstall needed). If you edit `data-forge/.claude-plugin/plugin.json` or the root `.claude-plugin/marketplace.json`, run `/plugin marketplace update intuit-de` to refresh.
 
 ### Prerequisites
 
@@ -58,15 +60,15 @@ Changes to agent/skill files in the checkout are picked up on the next Claude Co
 ## Use
 
 ```
-/ai-etl-data:data-issue-fix JIRA-XXXX
+/data-forge:data-issue-fix JIRA-XXXX
 ```
 
 Or invoke any specialist sub-agent directly:
 
 ```
-Agent(ai-etl-data:data-issue-diagnoser, "why is last_routing_number 97% NULL since Dec 2025?")
-Agent(ai-etl-data:bpp-pipeline-runner, "run pipeline for JIRA-XXXX")
-Agent(ai-etl-data:data-issue-validator, "verify JIRA-XXXX on schema_name.table_name after commit <commit-sha>")
+Agent(data-forge:data-issue-diagnoser, "why is last_routing_number 97% NULL since Dec 2025?")
+Agent(data-forge:bpp-pipeline-runner, "run pipeline for JIRA-XXXX")
+Agent(data-forge:data-issue-validator, "verify JIRA-XXXX on schema_name.table_name after commit <commit-sha>")
 ```
 
 ## Required MCPs
@@ -199,11 +201,29 @@ flowchart LR
 
 Every sub-agent can be invoked standalone (e.g., `Agent(data-issue-diagnoser, ...)`). Read-only sub-agents return findings and suggest the next step. Write sub-agents always gate before any write, regardless of invocation path.
 
+## Repo layout
+
+```
+claude-de-plugins/                    ← git repo root (intuit-de marketplace)
+├── .claude-plugin/
+│   └── marketplace.json              ← marketplace manifest (stays at root)
+├── README.md
+└── data-forge/                       ← the plugin itself
+    ├── .claude-plugin/
+    │   └── plugin.json
+    ├── agents/
+    ├── commands/
+    └── skills/
+        └── data-issue-patterns/
+```
+
+The root `marketplace.json` points at `data-forge/` via its `path` field, so a single repo can ship multiple plugins in sibling directories in the future.
+
 ## Architecture
 
 Two pieces, working together:
 
-### Agents (`agents/`)
+### Agents (`data-forge/agents/`)
 Isolated workflow executors. Each runs in a fresh conversation context.
 
 - `data-issue-fixer` — orchestrator
@@ -216,8 +236,8 @@ Isolated workflow executors. Each runs in a fresh conversation context.
 - `git-release-agent` — commit / push / PR
 - `incident-scribe` — structures raw incident reports
 
-### Skill (`skills/data-issue-patterns/`)
-Shared reference library the agents delegate to — diagnostic patterns, comment templates, SQL skeletons, guardrails. Updates here propagate to all agents without editing agent files. Referenced inside agent prompts as `${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/...`.
+### Skill (`data-forge/skills/data-issue-patterns/`)
+Shared reference library the agents delegate to — diagnostic patterns, comment templates, SQL skeletons, guardrails. Updates here propagate to all agents without editing agent files. Referenced inside agent prompts as `${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/...` (where `${CLAUDE_PLUGIN_ROOT}` resolves to `data-forge/`).
 
 ```
 data-issue-patterns/
@@ -253,7 +273,7 @@ data-issue-patterns/
 
 ## Guardrails
 
-See `skills/data-issue-patterns/refs/guardrails.md` for the full policy. Quick reference:
+See `data-forge/skills/data-issue-patterns/refs/guardrails.md` for the full policy. Quick reference:
 
 - **Code edits:** allowed without asking
 - **Jira comments:** always ask first
@@ -277,9 +297,9 @@ The orchestrator reads `CLAUDE.md` (project root, parent dirs, `~/CLAUDE.md`) fo
 
 ## Extending
 
-- **New diagnostic pattern?** Add to `skills/data-issue-patterns/refs/worked-examples.md`. One case study per section; keep Situation / Insight / Lesson structure.
-- **New Jira comment template?** Add to `skills/data-issue-patterns/templates/` and update `jira-commenter`'s template pointer list.
-- **New verification check?** Add to `skills/data-issue-patterns/sql/verification-queries.sql` and mention it in `refs/diagnostic-method.md`.
+- **New diagnostic pattern?** Add to `data-forge/skills/data-issue-patterns/refs/worked-examples.md`. One case study per section; keep Situation / Insight / Lesson structure.
+- **New Jira comment template?** Add to `data-forge/skills/data-issue-patterns/templates/` and update `jira-commenter`'s template pointer list.
+- **New verification check?** Add to `data-forge/skills/data-issue-patterns/sql/verification-queries.sql` and mention it in `refs/diagnostic-method.md`.
 - **New repo?** Ensure it has a `CLAUDE.md` describing its conventions and that its data warehouse MCP is connectable. No agent code changes required.
 
 ## Example session
@@ -369,3 +389,4 @@ PRF validated, PRD pipeline succeeded. NULL% baseline restored in stable.
 - **Templates** as separate files → easier to version, easier for engineers to tweak without agent prompt edits.
 - **SQL skeletons** in their own file → can be copy-pasted into a Databricks notebook for ad-hoc investigation.
 - **Worked examples** as a growing file → the system learns over time as patterns are added.
+- **Plugin nested under `data-forge/`** → the `intuit-de` marketplace can ship additional plugins as sibling directories without restructuring.
