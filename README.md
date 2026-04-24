@@ -167,10 +167,10 @@ flowchart LR
 
     Orchestrator[data-issue-fixer<br/>orchestrator]
 
-    Orchestrator -.->|Phase 1| A1[data-issue-intake<br/>reads Jira]
+    Orchestrator -.->|Phase 1| A1[data-work-intake<br/>reads Jira]
     Orchestrator -.->|Phase 1 fallback| A8[incident-scribe<br/>structures raw incidents]
     Orchestrator -.->|Phase 2| A2[data-issue-diagnoser<br/>root-cause analysis]
-    Orchestrator -.->|Phase 3| A3[data-issue-fixer-coder<br/>minimal code fix]
+    Orchestrator -.->|Phase 3| A3[data-pipeline-coder<br/>minimal code fix]
     Orchestrator -.->|Phase 4| A4[git-release-agent<br/>commit / push / PR]
     Orchestrator -.->|Phase 5 opt. 1| A5[bpp-pipeline-runner<br/>PRF + PRD BPP execution]
     Orchestrator -.->|Phase 6| A6[data-issue-validator<br/>PRF + stable checks]
@@ -227,9 +227,9 @@ Two pieces, working together:
 Isolated workflow executors. Each runs in a fresh conversation context.
 
 - `data-issue-fixer` — orchestrator
-- `data-issue-intake` — reads Jira ticket + comments
+- `data-work-intake` — reads any data-pipeline Jira ticket + comments (bug, enhancement, optimization)
 - `data-issue-diagnoser` — root-cause analysis
-- `data-issue-fixer-coder` — implements code fix
+- `data-pipeline-coder` — implements approved code changes (bug fix or change plan)
 - `bpp-pipeline-runner` — executes BPP pipeline post-merge
 - `data-issue-validator` — post-deploy verification
 - `jira-commenter` — posts Jira comments; optionally transitions the ticket to a terminal status
@@ -262,9 +262,9 @@ data-issue-patterns/
 | Agent | Tools | Writes? |
 | --- | --- | --- |
 | `data-issue-fixer` (orchestrator) | Agent + full | yes (via sub-agents) |
-| `data-issue-intake` | Read, Grep, Glob | no |
+| `data-work-intake` | Read, Grep, Glob | no |
 | `data-issue-diagnoser` | Read, Grep, Glob, Bash | no |
-| `data-issue-fixer-coder` | Read, Edit, Write, Grep, Glob, Bash | edits files, no commit |
+| `data-pipeline-coder` | Read, Edit, Write, Grep, Glob, Bash | edits files, no commit |
 | `bpp-pipeline-runner` | Read, ScheduleWakeup | BPP only, with approval |
 | `data-issue-validator` | Read, Bash | no |
 | `jira-commenter` | Read | Jira comments + ticket transitions, with approval |

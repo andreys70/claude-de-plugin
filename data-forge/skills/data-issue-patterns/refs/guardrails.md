@@ -29,7 +29,7 @@ Before code changes begin. The orchestrator presents the diagnosis (root cause, 
 > "Here is the diagnosis. I **strongly recommend** confirming before I proceed to code changes. Continue to the fix? (yes / refine / stop)"
 
 ### Checkpoint 2 — Pre-commit
-Before any git action. The orchestrator presents the full diff (from `data-issue-fixer-coder`) and asks:
+Before any git action. The orchestrator presents the full diff (from `data-pipeline-coder`) and asks:
 
 > "Here is the proposed fix. I **strongly recommend** reviewing before commit. Approve the diff? (yes / refine / stop)"
 
