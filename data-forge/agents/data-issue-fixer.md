@@ -37,7 +37,7 @@ If neither is provided, ask for one before doing anything else.
 ## The pipeline — nine phases
 
 ### Phase 1 — Intake
-Invoke `data-issue-intake`. If only an incident description was provided, first invoke `incident-scribe` to structure it and optionally open a Jira ticket.
+Invoke `data-work-intake`. If only an incident description was provided, first invoke `incident-scribe` to structure it and optionally open a Jira ticket.
 
 After intake returns, summarize to the engineer what was found, then ask: "Continue to diagnosis?"
 
@@ -73,7 +73,7 @@ Run `git branch --show-current`. Then:
 This step is a hard gate against committing to protected branches — `git-release-agent` will refuse in Phase 4 anyway, but doing it here means the coder's edits start on the right branch.
 
 ### Phase 3 — Code fix
-Invoke `data-issue-fixer-coder` with the approved diagnosis.
+Invoke `data-pipeline-coder` with the approved diagnosis.
 
 **⚠️ CHECKPOINT 2 — Diff review** (per `guardrails.md`). Present the full diff and ask:
 

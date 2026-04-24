@@ -7,11 +7,7 @@
   "plugins": [
     {
       "name": "data-forge",
-      "source": {
-        "source": "url",
-        "url": "git@github.intuit.com:RiskDataAnalytics/claude-de-plugins.git"
-      },
-      "path": "data-forge",
+      "source": "./data-forge",
       "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification."
     }
   ]

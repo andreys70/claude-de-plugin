@@ -16,7 +16,7 @@ data-issue-patterns/
 │   ├── jira-investigation-comment.md     ← for mid-investigation Jira posts
 │   ├── jira-verification-comment.md      ← for post-deploy Jira posts
 │   ├── jira-cr-format.md                 ← Change Request format (pre-deploy)
-│   ├── intake-report.md                  ← output format for data-issue-intake
+│   ├── intake-report.md                  ← output format for data-work-intake
 │   ├── diagnosis-report.md               ← output format for data-issue-diagnoser
 │   └── validation-report.md              ← output format for data-issue-validator
 ├── sql/
@@ -30,7 +30,7 @@ data-issue-patterns/
 ## When agents should consult this skill
 
 - **`data-issue-diagnoser`** → `refs/diagnostic-method.md` (the rule-out pattern) + `refs/worked-examples.md` (when stuck, match the current problem against known patterns) + `templates/diagnosis-report.md` (output format).
-- **`data-issue-intake`** → `templates/intake-report.md` (output format).
+- **`data-work-intake`** → `templates/intake-report.md` (output format).
 - **`data-issue-validator`** → `sql/verification-queries.sql` (the 5 standard checks) + `templates/validation-report.md` (output format).
 - **`jira-commenter`** → `templates/jira-*-comment.md` (rendering). Always check the engineer's personal CR memory first (`~/.claude/projects/*/memory/feedback_cr_format.md`) — if present, it supersedes `templates/jira-cr-format.md`.
 - **`data-issue-fixer` (orchestrator)** → `refs/guardrails.md` (checkpoint and approval rules).
