@@ -6,56 +6,75 @@ Ships from the `intuit-de` marketplace (this repo), which may grow to host addit
 
 ## Install
 
-Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps.
+Claude Code installs plugins from **marketplaces**, not directly from plugin repos. This repo ships its own marketplace manifest (`.claude-plugin/marketplace.json`), so installing is two steps: register the `intuit-de` marketplace, then install the `data-forge` plugin from it.
 
-### Register the marketplace (once per machine)
+### Prerequisites
 
-```bash
+Before installing, make sure you can clone this repo from GHE. Claude Code clones the marketplace repo on your behalf when you run `/plugin marketplace add`, so whatever auth `git clone` needs must already be set up.
+
+- **SSH clone** (recommended): your SSH key must be registered at `github.intuit.com`. Test with `ssh -T git@github.intuit.com` — you should see a greeting, not a permission-denied error.
+- **`gh` CLI** (optional but handy for the workflow itself): authenticated against `github.intuit.com` — `gh auth status --hostname github.intuit.com`.
+- All [required MCPs](#required-mcps) connected — the orchestrator fails fast if any are missing.
+
+### 1. Register the marketplace (once per machine)
+
+Run this inside any Claude Code session:
+
+```
 /plugin marketplace add git@github.intuit.com:RiskDataAnalytics/claude-de-plugins.git
 ```
 
-### Install the plugin
+Claude Code clones the repo, reads `.claude-plugin/marketplace.json`, and registers the `intuit-de` marketplace locally. You only need to do this once per machine — the marketplace stays registered across sessions.
 
-```bash
+### 2. Install the plugin
+
+```
 /plugin install data-forge@intuit-de
 ```
 
+The `@intuit-de` suffix tells Claude Code which marketplace to resolve `data-forge` from. Commands (`/data-forge:data-issue-fix`) and agents (`data-forge:data-issue-diagnoser`, etc.) become available immediately.
+
 ### Verify
 
-```bash
+```
 /plugin marketplace list
 /plugin list
 ```
 
+You should see `intuit-de` in the marketplace list and `data-forge` in the plugin list.
+
 ### Update later
 
-```bash
+When the plugin ships a new version (anyone on the team merges changes to `master`), pull the update:
+
+```
 /plugin marketplace update intuit-de
 /plugin install data-forge@intuit-de
 ```
 
 ### Uninstall
 
-```bash
+```
 /plugin uninstall data-forge
 /plugin marketplace remove intuit-de
 ```
 
 ### Local development
 
-When iterating on the plugin before pushing, point Claude Code at your local checkout instead of the GHE repo:
+When iterating on the plugin before pushing, point Claude Code at your local checkout instead of the GHE repo. Use the absolute path to your clone:
 
-```bash
+```
 /plugin marketplace add ~/Documents/GitHub/claude-de-plugins
 /plugin install data-forge@intuit-de
 ```
 
 Changes to agent/skill files in the checkout are picked up on the next Claude Code session (no reinstall needed). If you edit `data-forge/.claude-plugin/plugin.json` or the root `.claude-plugin/marketplace.json`, run `/plugin marketplace update intuit-de` to refresh.
 
-### Prerequisites
+### Troubleshooting install failures
 
-- `gh` CLI authenticated against `github.intuit.com` (`gh auth status --hostname github.intuit.com`)
-- All [required MCPs](#required-mcps) connected — the orchestrator fails fast if any are missing
+- **`fatal: Could not read from remote repository` / SSH permission denied** — your SSH key isn't set up for `github.intuit.com`. Re-check `ssh -T git@github.intuit.com`.
+- **`marketplace.json: schema validation failed`** — you're on an older, broken version of the manifest. Run `/plugin marketplace update intuit-de` to pull the current one, or remove and re-add the marketplace.
+- **Plugin installs but commands don't appear** — restart Claude Code; plugins are loaded at session start.
 
 ## Use
 
@@ -217,7 +236,7 @@ claude-de-plugins/                    ← git repo root (intuit-de marketplace)
         └── data-issue-patterns/
 ```
 
-The root `marketplace.json` points at `data-forge/` via its `path` field, so a single repo can ship multiple plugins in sibling directories in the future.
+The root `marketplace.json` points at `data-forge/` via a relative `source` (`"./data-forge"`), so a single repo can ship multiple plugins as sibling directories in the future — each entry in `plugins[]` just points at its own folder.
 
 ## Architecture
 
