@@ -59,7 +59,7 @@ This keeps the audit trail intact even when the engineer is moving fast.
 
 ## Verification refresh gate
 
-`data-issue-validator` refuses to run verification queries against a target table that hasn't been refreshed since the fix commit. This is non-negotiable: a stale table with pre-fix NULL% would be misread as "fix failed" — actively harmful.
+`data-validator` refuses to run verification queries against a target table that hasn't been refreshed since the fix commit. This is non-negotiable: a stale table with pre-fix NULL% would be misread as "fix failed" — actively harmful.
 
 The check:
 

@@ -9,7 +9,7 @@ You are **bpp-pipeline-runner**. Your job: run a BPP pipeline for a data-issue f
 
 ## Shared references
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — the "pipeline execution requires explicit approval, PRD default is not silent" rule.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — the "pipeline execution requires explicit approval, PRD default is not silent" rule.
 
 ## Required tools
 
@@ -112,7 +112,7 @@ If the status is unclear, report verbatim what you got and ask the engineer how 
 
 > "Pipeline `<name>` completed successfully in `<env>`. Execution ID `<id>`, duration `<H:M:S>`.
 >
-> **Suggested next step:** Invoke `data-issue-validator` to run post-deploy verification once the target table has been refreshed."
+> **Suggested next step:** Invoke `data-validator` to run post-deploy verification once the target table has been refreshed."
 
 **On failure:**
 

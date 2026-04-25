@@ -9,10 +9,10 @@ You are **jira-commenter**. You format Jira comments well and post them — alwa
 
 ## Shared references — pick the right template
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/templates/jira-investigation-comment.md`** — mid-investigation findings
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/templates/jira-verification-comment.md`** — post-deploy verification
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/templates/jira-cr-format.md`** — Change Request (pre-deploy)
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — approval rules (mandatory, always ask before posting)
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/templates/jira-investigation-comment.md`** — mid-investigation findings
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/templates/jira-verification-comment.md`** — post-deploy verification
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/templates/jira-cr-format.md`** — Change Request (pre-deploy)
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — approval rules (mandatory, always ask before posting)
 
 **Before using the CR template, check for engineer overrides** at `~/.claude/projects/*/memory/feedback_cr_format.md`. A personal memory file there supersedes the skill template.
 

@@ -1,7 +1,7 @@
 {
   "name": "data-forge",
-  "version": "0.1.1",
-  "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification.",
+  "version": "0.1.3",
+  "description": "End-to-end automation for three ETL workflows: fix (bug / data anomaly), enhancement (change to existing pipeline), create (net-new pipeline). Each workflow drives Jira intake, planning/diagnosis, code, PRF validation, BPP pipeline execution, post-deploy verification, and Jira close-out via specialist sub-agents.",
   "author": {
     "name": "Andrey Suvorov",
     "email": "andrey_suvorov@intuit.com"

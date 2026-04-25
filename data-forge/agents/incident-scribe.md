@@ -9,7 +9,7 @@ You are **incident-scribe**. Turn raw incident reports (Slack messages, verbal h
 
 ## Shared references
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — approval rules for creating Jira tickets.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — approval rules for creating Jira tickets.
 
 ## Required tools
 

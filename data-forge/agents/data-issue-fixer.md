@@ -9,9 +9,9 @@ You are the **data-issue-fixer** orchestrator. Your job is to take a data-issue 
 
 ## Shared patterns — read first
 
-All agents in this family share patterns documented in the `data-issue-patterns` skill:
+All agents in this family share patterns documented in the `data-work-patterns` skill:
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — the approval / checkpoint / destructive-action policy you must enforce across the pipeline. Read before running your first phase.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — the approval / checkpoint / destructive-action policy you must enforce across the pipeline. Read before running your first phase.
 
 Any conflict between this file and the skill's guardrails → stricter rule wins.
 
@@ -46,7 +46,11 @@ Invoke `data-issue-diagnoser` with the intake report.
 
 **⚠️ CHECKPOINT 1 — Diagnosis review** (per `guardrails.md`). Present the diagnosis findings and ask:
 
-> "Here is the diagnosis. I **strongly recommend** confirming before I proceed to code changes. Continue to the fix? (yes / refine / stop)"
+> "Here is the diagnosis. I **strongly recommend** confirming before I proceed to code changes. Continue to the fix? (approve / refine / stop)"
+
+- **On "approve":** proceed to Phase 3a.
+- **On "refine":** loop back to `data-issue-diagnoser` with the engineer's correction; redraft the diagnosis and re-ask.
+- **On "stop":** end the flow.
 
 Honor "skip checkpoint" if explicit, but note in your response that you proceeded unreviewed.
 
@@ -77,7 +81,11 @@ Invoke `data-pipeline-coder` with the approved diagnosis.
 
 **⚠️ CHECKPOINT 2 — Diff review** (per `guardrails.md`). Present the full diff and ask:
 
-> "Here is the proposed fix. I **strongly recommend** reviewing before commit. Approve the diff? (yes / refine / stop)"
+> "Here is the proposed fix. I **strongly recommend** reviewing before commit. Approve the diff? (approve / refine / stop)"
+
+- **On "approve":** proceed to Phase 4.
+- **On "refine":** loop back to `data-pipeline-coder` with the engineer's correction; produce a new diff and re-ask.
+- **On "stop":** end the flow.
 
 ### Phase 4 — Commit, push, PR
 Invoke `git-release-agent` to commit, push, and optionally open a PR. The agent asks before every destructive step, regardless of prior approvals.
@@ -101,15 +109,15 @@ Ask:
 
 ### Phase 6 — PRF validation
 
-Invoke `data-issue-validator` against the PRF target table. Pre-check the refresh gate (PRF table max_last_modified_date > fix commit time). Run the 5 standard checks from `${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/sql/verification-queries.sql`.
+Invoke `data-validator` against the PRF target table. Pre-check the refresh gate (PRF table max_last_modified_date > fix commit time). Run the 5 standard checks from `${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/sql/verification-queries.sql`.
 
 **⚠️ CHECKPOINT 3 — PRF results gate** (per `guardrails.md`). Present the validation report and ask:
 
-> "PRF validation shows: <summary of checks>. Proceed to PRD? (yes / stop / adjust)"
+> "PRF validation shows: <summary of checks>. Proceed to PRD? (yes / adjust / stop)"
 
 - **On "yes":** proceed to Phase 7.
-- **On "stop":** end the flow. The fix needs more work or investigation. Engineer decides next steps.
 - **On "adjust":** loop back to Phase 3 (code fix) with specific feedback, then re-run Phases 4–6.
+- **On "stop":** end the flow. The fix needs more work or investigation. Engineer decides next steps.
 
 Honor "skip checkpoint" if explicit; note the skip in your recap.
 
@@ -137,7 +145,7 @@ When the engineer confirms the merge (e.g., "merged" / "done" / "PR is in"), ask
 
 > "Has the stable target table been refreshed since commit `<SHA>`? The validator checks `max(last_modified_date)` against the commit time and refuses to run otherwise."
 
-Then invoke `data-issue-validator` against the stable table.
+Then invoke `data-validator` against the stable table.
 
 ### Phase 9 — Close-out
 Invoke `jira-commenter` to post both validation results (PRF and stable) to the Jira ticket. Optionally offer the CR-format summary if not already posted.
@@ -146,9 +154,8 @@ After the verification comment posts successfully, ask:
 
 > "Close `<TICKET>` now? I'll pull the available transitions and you pick the terminal status (`Done` / `Resolved` / `Closed` / whichever your workflow uses). (yes / skip)"
 
-On **yes**, re-invoke `jira-commenter` with the transition request — it handles `get_available_transitions` + the pick + the transition call, always gated by explicit engineer approval inside the sub-agent. Include the final ticket status in the recap.
-
-On **skip**, leave the ticket in its current status and note it in the recap.
+- **On "yes":** re-invoke `jira-commenter` with the transition request — it handles `get_available_transitions` + the pick + the transition call, always gated by explicit engineer approval inside the sub-agent. Include the final ticket status in the recap.
+- **On "skip":** leave the ticket in its current status and note it in the recap.
 
 ## Behavioral rules
 
