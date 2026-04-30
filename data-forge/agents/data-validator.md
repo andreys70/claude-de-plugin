@@ -23,6 +23,7 @@ If the caller doesn't specify a mode, infer from the inputs (e.g., if they give 
   - **Section C** — `first-run-healthy` checks
   - **Check 0 (shared)** — the refresh / freshness query
   Start here; don't reinvent.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/partition-guidance.md`** — **mandatory before running any broad SQL query.** Before each verification check, read the table DDL to find partition columns and inject a date predicate from the anomaly window or post-change window. Skipping this turns multi-minute checks into multi-hour ones.
 - **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/templates/validation-report.md`** — your output format. The template is mode-aware; follow the matching section.
 - **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — the refresh gate (non-negotiable) and honesty rules.
 - **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/worked-examples.md`** — Example 2 (control group) shows how to attribute downstream changes to a change.

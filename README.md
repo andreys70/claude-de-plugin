@@ -148,6 +148,10 @@ This means you won't be asked to authenticate four services at the start of ever
 
 (The create flow's Phase 1 also accepts a freeform spec when no Jira ticket exists yet — `jira-mcp` is then not required at all for that single run. The other three are still mandatory.)
 
+### Why Databricks queries stay fast
+
+Both `data-issue-diagnoser` and `data-validator` follow the routine in `data-forge/skills/data-work-patterns/refs/partition-guidance.md` before running any broad SQL: read the table DDL, identify partition columns, inject a date predicate from the Jira anomaly window or the post-change window. This is what keeps diagnostic and verification queries in the seconds-to-minutes range instead of multi-hour scans. If a query still takes more than ~30s, the agent will ask you for a tighter date range rather than waiting it out.
+
 ## Workflow diagram — fix flow
 
 The fix orchestrator (`data-issue-fixer`) runs nine phases plus a working-branch pre-flight (Phase 3a). Three checkpoints (post-diagnosis, pre-commit, post-PRF-validation) gate on engineer approval. Destructive actions (Jira posts, git commits, git push, PR creation, BPP execution) always require explicit approval even inside an approved checkpoint.
@@ -348,6 +352,8 @@ Shared reference library the agents delegate to — diagnostic and change-planni
 data-work-patterns/
 ├── SKILL.md
 ├── refs/
+│   ├── mcp-prerequisites.md      ← Phase 0 fail-fast MCP-registered check (all orchestrators)
+│   ├── partition-guidance.md     ← mandatory partition-pruning routine before broad SQL (diagnoser & validator)
 │   ├── diagnostic-method.md      ← rule-out pattern (fix flow)
 │   ├── change-plan-method.md     ← scope-and-plan pattern (enhancement & create)
 │   ├── worked-examples.md        ← real case studies (bridges, control groups, red herrings)
