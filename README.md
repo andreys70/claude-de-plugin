@@ -126,7 +126,7 @@ These two sub-agents take a `mode` parameter so the same agent can serve all thr
 
 ## Required MCPs
 
-The plugin requires four MCPs to be connected at the user level **before** running any command. These are non-negotiable prerequisites — each orchestrator probes them at the start of every run and refuses to proceed if any is missing.
+The plugin requires four MCPs to be **registered** at the user level before running any command. These are non-negotiable prerequisites:
 
 | MCP | Required for |
 |---|---|
@@ -135,9 +135,18 @@ The plugin requires four MCPs to be connected at the user level **before** runni
 | `DAST-Orch` | executing BPP pipelines (PRF and PRD) |
 | `intuit-github-mcp` | opening pull requests |
 
-If any are not connected when you start, you'll get an immediate `Missing MCP: <name>` message. Connect the missing one and re-run.
+Each orchestrator's Phase 0 verifies these are *registered* (their tools are present in the toolset) and refuses to proceed if any is missing — you'll get an immediate `Missing MCP: <name>` message. Add the missing one to your MCP config and restart Claude Code.
 
-(The create flow's Phase 1 will also accept a freeform spec when no Jira ticket exists yet — `jira-mcp` is then not required for that single run. The other three are still mandatory.)
+**Authentication is deferred.** Phase 0 does not call any MCP tool — it only checks that the tools exist. Each MCP is authenticated on first actual use by the matching sub-agent during the workflow:
+
+- `databricks-mcp` → first SQL call from `data-issue-diagnoser` (fix flow Phase 2) or `data-validator` (Phase 6/8)
+- `intuit-github-mcp` → first PR-related call from `git-release-agent` (Phase 4)
+- `DAST-Orch` → first call from `bpp-pipeline-runner` (Phase 5/7)
+- `jira-mcp` → first call from `data-work-intake` (Phase 1) or `jira-commenter` (Phase 9)
+
+This means you won't be asked to authenticate four services at the start of every run; you authenticate each one only when the workflow actually needs it, and only the first time per session.
+
+(The create flow's Phase 1 also accepts a freeform spec when no Jira ticket exists yet — `jira-mcp` is then not required at all for that single run. The other three are still mandatory.)
 
 ## Workflow diagram — fix flow
 
@@ -221,7 +230,7 @@ flowchart TD
 
 Three orchestrators (one per workflow) share a common roster of specialist sub-agents. Each orchestrator owns its phase flow; sub-agents own their scoped work and are reused across workflows. The shared `data-work-patterns` skill is the single source of truth for templates, methods, and SQL.
 
-**Orchestrators do not call MCP tools directly** (except for the four cheap Phase 0 probes that verify each MCP is connected). All Jira reads/writes, SQL execution, BPP pipeline runs, and PR creation are delegated to the matching sub-agent. This keeps the orchestrator's tool surface minimal and makes failures attributable to the right specialist.
+**Orchestrators do not call MCP tools directly.** All Jira reads/writes, SQL execution, BPP pipeline runs, and PR creation are delegated to the matching sub-agent. The orchestrator's Phase 0 only inspects its own toolset to verify the MCPs are *registered* (no tool calls, no auth triggered). This keeps the orchestrator's tool surface minimal and makes failures attributable to the right specialist.
 
 ```mermaid
 flowchart LR

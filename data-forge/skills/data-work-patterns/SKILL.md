@@ -27,6 +27,7 @@ data-work-patterns/
 │                                              (B) acceptance-criteria (enhancement)
 │                                              (C) first-run-healthy (create)
 └── refs/
+    ├── mcp-prerequisites.md              ← Phase 0 fail-fast MCP-registered check (all orchestrators)
     ├── diagnostic-method.md              ← the rule-out pattern for fix flow
     ├── change-plan-method.md             ← the "scope + propose diff before writing" pattern for enhancement and create flows
     ├── worked-examples.md                ← real case studies (bridges, control groups, red herrings)
@@ -40,7 +41,7 @@ data-work-patterns/
 - **`data-pipeline-coder`** → `refs/guardrails.md` (what you must NOT do). For `mode: enhancement`, read `refs/change-plan-method.md` first. For `mode: scaffold`, read `templates/scaffold-plan.md` for the expected plan shape.
 - **`data-validator`** → `sql/verification-queries.sql` (pick the section matching the check-set mode) + `templates/validation-report.md`.
 - **`jira-commenter`** → `templates/jira-*-comment.md`. Always check the engineer's personal CR memory first (`~/.claude/projects/*/memory/feedback_cr_format.md`) — if present, it supersedes `templates/jira-cr-format.md`.
-- **Orchestrators** (`data-issue-fixer`, `data-enhancement-driver`, `data-creator-driver`) → `refs/guardrails.md` (checkpoint and approval rules, workflow-specific notes).
+- **Orchestrators** (`data-issue-fixer`, `data-enhancement-driver`, `data-creator-driver`) → `refs/mcp-prerequisites.md` (Phase 0 fail-fast) + `refs/guardrails.md` (checkpoint and approval rules, workflow-specific notes).
 
 ## The diagnostic method — quick reference (fix flow)
 

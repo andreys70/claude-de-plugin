@@ -1,6 +1,6 @@
 {
   "name": "data-forge",
-  "version": "0.1.10",
+  "version": "0.1.12",
   "description": "End-to-end automation for three ETL workflows: fix (bug / data anomaly), enhancement (change to existing pipeline), create (net-new pipeline). Each workflow drives Jira intake, planning/diagnosis, code, PRF validation, BPP pipeline execution, post-deploy verification, and Jira close-out via specialist sub-agents.",
   "author": {
     "name": "Andrey Suvorov",
