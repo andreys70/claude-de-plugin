@@ -111,12 +111,18 @@ Agent(data-forge:data-validator, "verify JIRA-XXXX on schema_name.table_name aft
 
 ## Required MCPs
 
-The orchestrator fails fast if any of these are not connected:
+The plugin requires four MCPs to be connected at the user level **before** running any command. These are non-negotiable prerequisites — each orchestrator probes them at the start of every run and refuses to proceed if any is missing.
 
-- A data warehouse MCP (`databricks-mcp`, or equivalent for Redshift / BigQuery / Snowflake)
-- `jira-mcp`
-- `DAST-Orch`
-- `intuit-github-mcp`
+| MCP | Required for |
+|---|---|
+| `jira-mcp` | reading tickets, posting comments, transitioning status |
+| `databricks-mcp` | running diagnostic and verification SQL |
+| `DAST-Orch` | executing BPP pipelines (PRF and PRD) |
+| `intuit-github-mcp` | opening pull requests |
+
+If any are not connected when you start, you'll get an immediate `Missing MCP: <name>` message. Connect the missing one and re-run.
+
+(The create flow's Phase 1 will also accept a freeform spec when no Jira ticket exists yet — `jira-mcp` is then not required for that single run. The other three are still mandatory.)
 
 ## Workflow diagram — fix flow
 

@@ -26,14 +26,24 @@ Any conflict between this file and the skill's guardrails → stricter rule wins
 
 ## Hard requirements — fail fast
 
-Before starting any work, verify these MCPs are available:
+Before starting any work, verify all four required MCPs are connected. These are non-negotiable prerequisites for the plugin:
 
-- A data warehouse MCP (e.g., `databricks-mcp`, or equivalent for Redshift / BigQuery / Snowflake).
-- `jira-mcp`
-- `DAST-Orch`
-- `intuit-github-mcp`
+| MCP | Probe tool | Used in |
+|---|---|---|
+| `jira-mcp` | `mcp__jira-mcp__get_jira_user_info` | Phases 1, 9 |
+| `databricks-mcp` | `mcp__databricks-mcp__get_user_info` | Phases 6, 8 |
+| `DAST-Orch` | `mcp__DAST-Orch__get_jira_user_info` | Phases 5, 7 |
+| `intuit-github-mcp` | `mcp__intuit-github-mcp__search_users` (with `q: "type:user"`, `perPage: 1`) | Phase 4 |
 
-If any required MCP is missing, **stop immediately** and tell the engineer which one needs to be reconnected.
+**Procedure:** call each probe tool once, in parallel if possible. Each probe is a no-side-effect read that completes in milliseconds when the MCP is connected.
+
+**On any probe failure or tool-not-found:**
+
+> "Missing MCP: `<name>`. The data-forge plugin requires all four MCPs (jira-mcp, databricks-mcp, DAST-Orch, intuit-github-mcp) to be connected. Connect `<name>` and re-run."
+
+Stop immediately. Do not proceed to Phase 1, do not degrade gracefully, do not skip the missing capability.
+
+**Do not re-check during the run.** If all four passed at start, treat them as available for the rest of the session.
 
 ## Required inputs
 
