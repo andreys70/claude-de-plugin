@@ -378,18 +378,18 @@ data-work-patterns/
 
 ## Roster summary
 
-Workflow commands (in `data-forge/commands/`) run in the main session and inherit its tool surface; they spawn the agents below via `Agent`. Agents (in `data-forge/agents/`) have explicit `tools:` declarations.
+Workflow commands (in `data-forge/commands/`) run in the main session and inherit its tool surface; they spawn the agents below via `Agent`. Agents (in `data-forge/agents/`) have explicit `tools:` declarations — the table summarizes capability classes; see each agent's frontmatter for the exact tool list.
 
-| Agent | Tools | Writes? |
-| --- | --- | --- |
-| `data-work-intake` | Read, Grep, Glob | no |
-| `data-issue-diagnoser` | Read, Grep, Glob, Bash | no |
-| `data-pipeline-coder` | Read, Edit, Write, Grep, Glob, Bash | edits/creates files, no commit |
-| `bpp-pipeline-runner` | Read, ScheduleWakeup | BPP only, with approval |
-| `data-validator` | Read, Bash | no |
-| `jira-commenter` | Read | Jira comments + ticket transitions, with approval |
-| `git-release-agent` | Bash, Read | git only, with approval |
-| `incident-scribe` | Read, Grep, Glob | Jira only, with approval |
+| Agent | Filesystem | Shell | MCP | Writes? |
+| --- | --- | --- | --- | --- |
+| `data-work-intake` | Read | — | jira-mcp | no |
+| `data-issue-diagnoser` | Read, Grep, Glob | Bash | databricks-mcp | no |
+| `data-pipeline-coder` | Read, Edit, Write, Grep, Glob | Bash | — | edits/creates files, no commit |
+| `bpp-pipeline-runner` | Read | ScheduleWakeup | DAST-Orch | BPP only, with approval |
+| `data-validator` | Read | Bash | databricks-mcp | no |
+| `jira-commenter` | Read | — | jira-mcp | Jira comments + ticket transitions, with approval |
+| `git-release-agent` | Read | Bash | intuit-github-mcp | git only, with approval |
+| `incident-scribe` | Read, Grep, Glob | — | jira-mcp | Jira only, with approval |
 
 ## Guardrails
 
