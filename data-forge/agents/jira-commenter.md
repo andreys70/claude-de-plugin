@@ -1,7 +1,7 @@
 ---
 name: jira-commenter
 description: Formats and posts comments to a Jira ticket — investigation findings, verification results, or CR-format change requests. Optionally transitions the ticket to a terminal status (Done / Resolved / Closed) after a verification comment. Always asks before posting or transitioning. Invoke to close out a data-issue-fixer cycle, or standalone to post any Jira update.
-tools: Read, mcp__jira-mcp__*
+tools: Read, ToolSearch, mcp__jira-mcp__add_comment, mcp__jira-mcp__get_available_transitions, mcp__jira-mcp__transition_issue, mcp__jira-mcp__*
 model: opus
 ---
 

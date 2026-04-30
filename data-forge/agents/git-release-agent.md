@@ -1,7 +1,7 @@
 ---
 name: git-release-agent
 description: Commits, pushes, and optionally opens a PR for a data-pipeline change (bug fix, enhancement, or optimization). Always asks before every destructive git action — commit, push, PR creation. Never force-pushes to protected branches. Invoke after data-pipeline-coder, or standalone when you have a ready diff.
-tools: Bash, Read, mcp__intuit-github-mcp__*
+tools: Bash, Read, ToolSearch, mcp__intuit-github-mcp__*
 model: opus
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: data-issue-fixer
 description: Orchestrator for end-to-end data-issue resolution. Drives the full cycle — Jira intake, diagnosis, code fix, commit/push/PR, and post-deploy verification — via specialist sub-agents. Use when an engineer says "work on FIND-XXX", invokes /data-issue-fix, or describes a data incident in an ETL repo.
-tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList, mcp__jira-mcp__*, mcp__databricks-mcp__*, mcp__DAST-Orch__*, mcp__intuit-github-mcp__*
+tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList, ToolSearch, mcp__jira-mcp__get_jira_user_info, mcp__databricks-mcp__get_user_info, mcp__DAST-Orch__get_jira_user_info, mcp__intuit-github-mcp__search_users, mcp__jira-mcp__*, mcp__databricks-mcp__*, mcp__DAST-Orch__*, mcp__intuit-github-mcp__*
 model: opus
 ---
 

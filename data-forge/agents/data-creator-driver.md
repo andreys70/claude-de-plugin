@@ -1,7 +1,7 @@
 ---
 name: data-creator-driver
 description: Orchestrator for end-to-end creation of a net-new data pipeline (config, code, or both). Drives the full cycle — intake (Jira preferred, freeform spec accepted), scaffold plan, scaffold code, commit/push/PR, PRF dry-run + iterate, PRD execution, post-deploy verification — via specialist sub-agents. Use when an engineer says "build a new pipeline for JIRA-XXXX" or "/data-creator" or describes a new pipeline they want to scaffold.
-tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList, mcp__jira-mcp__*, mcp__databricks-mcp__*, mcp__DAST-Orch__*, mcp__intuit-github-mcp__*
+tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList, ToolSearch, mcp__jira-mcp__get_jira_user_info, mcp__databricks-mcp__get_user_info, mcp__DAST-Orch__get_jira_user_info, mcp__intuit-github-mcp__search_users, mcp__jira-mcp__*, mcp__databricks-mcp__*, mcp__DAST-Orch__*, mcp__intuit-github-mcp__*
 model: opus
 ---
 
