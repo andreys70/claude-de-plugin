@@ -3,7 +3,9 @@ description: Top-level dispatcher for the data-forge plugin. Routes to one of th
 argument-hint: [<JIRA-KEY or freeform spec>] [<fix | enhancement | create>]
 ---
 
-You are dispatching to one of three workflows in the `data-forge` plugin. Parse `$ARGUMENTS` as up to two whitespace-separated tokens:
+You are the data-forge dispatcher. Your job is to figure out which of the three workflow commands to route to, then tell the engineer to run it.
+
+Parse `$ARGUMENTS` as up to two whitespace-separated tokens:
 
 - **First token (optional):** a Jira key (matches `[A-Z]+-\d+`) or a freeform spec / description.
 - **Second token (optional):** the workflow mode — exactly one of `fix`, `enhancement`, or `create`. Case-insensitive.
@@ -17,15 +19,15 @@ If `$ARGUMENTS` is empty, both are unspecified.
 
 ## Decide the workflow
 
-If the **mode** was given explicitly, use it. Skip to the dispatch step below.
+If the **mode** was given explicitly, use it. Skip to the routing step below.
 
 If the mode was **not** given, ask:
 
 > "Which workflow?
 >
-> **1. fix** — diagnose and fix a bug or data anomaly in an existing pipeline (`/data-issue-fix`)
-> **2. enhancement** — implement a change, optimization, or new behavior on an existing pipeline (`/data-enhancement`)
-> **3. create** — scaffold a net-new pipeline (config, code, or both) (`/data-creator`)
+> **1. fix** — diagnose and fix a bug or data anomaly in an existing pipeline (`/data-forge:data-issue-fix`)
+> **2. enhancement** — implement a change, optimization, or new behavior on an existing pipeline (`/data-forge:data-enhancement`)
+> **3. create** — scaffold a net-new pipeline (config, code, or both) (`/data-forge:data-creator`)
 >
 > (1 / 2 / 3, or `fix` / `enhancement` / `create`)"
 
@@ -36,24 +38,46 @@ Wait for the engineer's response. Map to the workflow:
 
 If the response is something else, re-ask.
 
-## Dispatch
+## Route — tell the engineer to run the matching command
 
-Once the workflow is determined, invoke the matching orchestrator agent **with the input** (the first token from `$ARGUMENTS`, if any):
+Once the workflow is determined, print exactly one line — the slash command for the engineer to run, with the input passed through verbatim:
 
-- **fix** → invoke the `data-issue-fixer` orchestrator. If no input was provided, the orchestrator will ask for a Jira key or incident description.
-- **enhancement** → invoke the `data-enhancement-driver` orchestrator. If no input was provided, the orchestrator will ask for a Jira key.
-- **create** → invoke the `data-creator-driver` orchestrator. If no input was provided, the orchestrator will ask whether the engineer has a Jira ticket or wants to work from a freeform spec.
+| Workflow | Command to run |
+|---|---|
+| fix | `/data-forge:data-issue-fix <input>` |
+| enhancement | `/data-forge:data-enhancement <input>` |
+| create | `/data-forge:data-creator <input>` |
 
-Hand the input through verbatim — don't paraphrase or restructure it. The orchestrators each read their inputs the way their underlying intake agent expects.
+If no input was provided, just print the command without arguments — the routed command will ask for what it needs.
+
+Example output:
+
+```
+Route: fix flow.
+Run: /data-forge:data-issue-fix FIND-742
+```
+
+Or, if no input:
+
+```
+Route: enhancement flow.
+Run: /data-forge:data-enhancement
+```
+
+That's it — your job ends here. The engineer types the printed command and the workflow proceeds from there. **Do not attempt to run the workflow yourself** — the routed slash command IS the workflow orchestrator and needs to be invoked directly.
+
+## Why this two-step pattern
+
+The workflow commands (`/data-forge:data-issue-fix`, `/data-forge:data-enhancement`, `/data-forge:data-creator`) each spawn specialist sub-agents (intake, diagnoser, coder, validator, etc.) via the `Agent` tool. Slash commands run in the main session and can do this; sub-agents cannot spawn other sub-agents. The dispatcher therefore can't proxy the workflow — it has to hand off to the matching slash command so that command runs in main-session context with `Agent` access.
 
 ## Examples
 
-- `/dispatch` — asks for input AND workflow.
-- `/dispatch FIND-742` — asks for workflow only; passes the Jira key to the chosen orchestrator.
-- `/dispatch fix` — asks for input only; routes to fix flow.
-- `/dispatch FIND-742 enhancement` — no prompts; routes directly to enhancement flow with `FIND-742`.
-- `/dispatch "build a daily settlement pipeline" create` — no prompts; routes to create flow with the spec as the input.
+- `/data-forge:dispatch` — asks for input AND workflow, then prints the routed command.
+- `/data-forge:dispatch FIND-742` — asks for workflow only, then prints `/data-forge:data-<flow> FIND-742`.
+- `/data-forge:dispatch fix` — asks for input only, then prints `/data-forge:data-issue-fix`.
+- `/data-forge:dispatch FIND-742 enhancement` — no prompts; prints `/data-forge:data-enhancement FIND-742`.
+- `/data-forge:dispatch "build a daily settlement pipeline" create` — no prompts; prints `/data-forge:data-creator "build a daily settlement pipeline"`.
 
 ## Note
 
-This dispatcher exists for discoverability — engineers who already know the workflow they want should call `/data-issue-fix`, `/data-enhancement`, or `/data-creator` directly to skip the dispatch prompt.
+This dispatcher exists for discoverability — engineers who already know the workflow they want should call `/data-forge:data-issue-fix`, `/data-forge:data-enhancement`, or `/data-forge:data-creator` directly to skip the dispatch prompt and the extra round-trip.

@@ -6,7 +6,9 @@ End-to-end automation for three data-pipeline workflows in ETL codebases:
 - **enhancement** (`/data-enhancement`) — implement a non-bug change against an existing pipeline. Jira intake → scope & change plan → code change → PRF validation → BPP pipeline → post-deploy verification → Jira close-out. **Two checkpoints** (pre-commit, post-PRF). The plan is reviewed inline.
 - **create** (`/data-creator`) — scaffold a net-new pipeline (config, code, or both). Intake (Jira preferred, freeform spec accepted) → scaffold plan → scaffold code → PRF dry-run → first-run verification → BPP pipeline → close-out. **Two checkpoints** (pre-commit, post-PRF). PRF iteration before PRD is expected.
 
-Each workflow has its own orchestrator and command. A top-level `/data-forge:dispatch` command prompts for the workflow when it's not specified. All three share the same agent roster (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the orchestrator.
+Each workflow is its own slash command — `/data-forge:data-issue-fix`, `/data-forge:data-enhancement`, `/data-forge:data-creator`. A top-level `/data-forge:dispatch` command routes when the workflow isn't specified. The three workflow commands share a common roster of specialist sub-agents (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the workflow command.
+
+The workflow commands themselves contain the orchestration logic (Phase 0 MCP check, the nine phases, the checkpoints). They run in the main session, which means they can spawn sub-agents via the `Agent` tool — sub-agents cannot spawn other sub-agents, so an "orchestrator agent" pattern doesn't work in Claude Code, but a "command-as-orchestrator" pattern does.
 
 Ships from the `intuit-de` marketplace (this repo), which may grow to host additional data-engineering plugins over time. The plugin itself lives at `data-forge/` inside the repo.
 
@@ -20,7 +22,7 @@ Before installing, make sure you can clone this repo from GHE. Claude Code clone
 
 - **SSH clone** (recommended): your SSH key must be registered at `github.intuit.com`. Test with `ssh -T git@github.intuit.com` — you should see a greeting, not a permission-denied error.
 - **`gh` CLI** (optional but handy for the workflow itself): authenticated against `github.intuit.com` — `gh auth status --hostname github.intuit.com`.
-- All [required MCPs](#required-mcps) connected — the orchestrator fails fast if any are missing.
+- All [required MCPs](#required-mcps) connected — each workflow command fails fast at Phase 0 if any are missing.
 
 ### 1. Register the marketplace (once per machine)
 
@@ -135,7 +137,7 @@ The plugin requires four MCPs to be **registered** at the user level before runn
 | `DAST-Orch` | executing BPP pipelines (PRF and PRD) |
 | `intuit-github-mcp` | opening pull requests |
 
-Each orchestrator's Phase 0 verifies these are *registered* (their tools are present in the toolset) and refuses to proceed if any is missing — you'll get an immediate `Missing MCP: <name>` message. Add the missing one to your MCP config and restart Claude Code.
+Each workflow command's Phase 0 verifies these are *registered* (their tools are present in the toolset) and refuses to proceed if any is missing — you'll get an immediate `Missing MCP: <name>` message. Add the missing one to your MCP config and restart Claude Code.
 
 **Authentication is deferred.** Phase 0 does not call any MCP tool — it only checks that the tools exist. Each MCP is authenticated on first actual use by the matching sub-agent during the workflow:
 
@@ -154,7 +156,7 @@ Both `data-issue-diagnoser` and `data-validator` follow the routine in `data-for
 
 ## Workflow diagram — fix flow
 
-The fix orchestrator (`data-issue-fixer`) runs nine phases plus a working-branch pre-flight (Phase 3a). Three checkpoints (post-diagnosis, pre-commit, post-PRF-validation) gate on engineer approval. Destructive actions (Jira posts, git commits, git push, PR creation, BPP execution) always require explicit approval even inside an approved checkpoint.
+The fix workflow command (`/data-forge:data-issue-fix`) runs nine phases plus a working-branch pre-flight (Phase 3a). Three checkpoints (post-diagnosis, pre-commit, post-PRF-validation) gate on engineer approval. Destructive actions (Jira posts, git commits, git push, PR creation, BPP execution) always require explicit approval even inside an approved checkpoint.
 
 The enhancement and create flows follow the same shape with two differences: Phase 2 is "scope & plan" (reviewed inline, no separate post-plan checkpoint) instead of diagnosis, and the validator runs in `acceptance-criteria` mode (enhancement) or `first-run-healthy` mode (create) instead of `anomaly-resolved`. The diagram below shows the fix flow as the canonical example.
 
@@ -232,9 +234,9 @@ flowchart TD
 
 ## Agent roster map
 
-Three orchestrators (one per workflow) share a common roster of specialist sub-agents. Each orchestrator owns its phase flow; sub-agents own their scoped work and are reused across workflows. The shared `data-work-patterns` skill is the single source of truth for templates, methods, and SQL.
+Three workflow commands (one per workflow) share a common roster of specialist sub-agents. Each command owns its phase flow; sub-agents own their scoped work and are reused across workflows. The shared `data-work-patterns` skill is the single source of truth for templates, methods, and SQL.
 
-**Orchestrators do not call MCP tools directly.** All Jira reads/writes, SQL execution, BPP pipeline runs, and PR creation are delegated to the matching sub-agent. The orchestrator's Phase 0 only inspects its own toolset to verify the MCPs are *registered* (no tool calls, no auth triggered). This keeps the orchestrator's tool surface minimal and makes failures attributable to the right specialist.
+**Workflow commands do not call MCP tools directly.** All Jira reads/writes, SQL execution, BPP pipeline runs, and PR creation are delegated to the matching sub-agent via `Agent`. The command's Phase 0 only inspects its own toolset to verify the MCPs are *registered* (no tool calls, no auth triggered). This keeps the command's tool surface minimal and makes failures attributable to the right specialist.
 
 ```mermaid
 flowchart LR
@@ -242,38 +244,38 @@ flowchart LR
     User -->|/data-forge:dispatch<br/>or specific command| OrchPick
 
     OrchPick{workflow?}
-    OrchPick -->|fix| Fixer[data-issue-fixer<br/>orchestrator]
-    OrchPick -->|enhancement| EnhDriver[data-enhancement-driver<br/>orchestrator]
-    OrchPick -->|create| CreatorDriver[data-creator-driver<br/>orchestrator]
+    OrchPick -->|fix| FixCmd[/data-forge:data-issue-fix/<br/>slash command]
+    OrchPick -->|enhancement| EnhCmd[/data-forge:data-enhancement/<br/>slash command]
+    OrchPick -->|create| CreateCmd[/data-forge:data-creator/<br/>slash command]
 
-    Fixer       -.->|Phase 1| A1[data-work-intake]
-    EnhDriver   -.->|Phase 1| A1
-    CreatorDriver -.->|Phase 1| A1
+    FixCmd     -.->|Phase 1| A1[data-work-intake]
+    EnhCmd     -.->|Phase 1| A1
+    CreateCmd  -.->|Phase 1| A1
 
-    Fixer       -.->|Phase 1 fallback| A8[incident-scribe]
-    Fixer       -.->|Phase 2 — diagnose| A2[data-issue-diagnoser]
-    EnhDriver   -.->|Phase 2 — change plan| InlinePlan{{inline plan<br/>in orchestrator}}
-    CreatorDriver -.->|Phase 2 — scaffold plan| InlinePlan
+    FixCmd     -.->|Phase 1 fallback| A8[incident-scribe]
+    FixCmd     -.->|Phase 2 — diagnose| A2[data-issue-diagnoser]
+    EnhCmd     -.->|Phase 2 — change plan| InlinePlan{{inline plan<br/>in command}}
+    CreateCmd  -.->|Phase 2 — scaffold plan| InlinePlan
 
-    Fixer       -.->|Phase 3 — mode: fix| A3[data-pipeline-coder]
-    EnhDriver   -.->|Phase 3 — mode: enhancement| A3
-    CreatorDriver -.->|Phase 3 — mode: scaffold| A3
+    FixCmd     -.->|Phase 3 — mode: fix| A3[data-pipeline-coder]
+    EnhCmd     -.->|Phase 3 — mode: enhancement| A3
+    CreateCmd  -.->|Phase 3 — mode: scaffold| A3
 
-    Fixer       -.->|Phases 4| A4[git-release-agent]
-    EnhDriver   -.->|Phases 4| A4
-    CreatorDriver -.->|Phases 4| A4
+    FixCmd     -.->|Phases 4| A4[git-release-agent]
+    EnhCmd     -.->|Phases 4| A4
+    CreateCmd  -.->|Phases 4| A4
 
-    Fixer       -.->|Phases 5 / 7| A5[bpp-pipeline-runner]
-    EnhDriver   -.->|Phases 5 / 7| A5
-    CreatorDriver -.->|Phases 5 / 7| A5
+    FixCmd     -.->|Phases 5 / 7| A5[bpp-pipeline-runner]
+    EnhCmd     -.->|Phases 5 / 7| A5
+    CreateCmd  -.->|Phases 5 / 7| A5
 
-    Fixer       -.->|Phases 6 / 8 — anomaly-resolved| A6[data-validator]
-    EnhDriver   -.->|Phases 6 / 8 — acceptance-criteria| A6
-    CreatorDriver -.->|Phases 6 / 8 — first-run-healthy| A6
+    FixCmd     -.->|Phases 6 / 8 — anomaly-resolved| A6[data-validator]
+    EnhCmd     -.->|Phases 6 / 8 — acceptance-criteria| A6
+    CreateCmd  -.->|Phases 6 / 8 — first-run-healthy| A6
 
-    Fixer       -.->|Phase 9| A7[jira-commenter]
-    EnhDriver   -.->|Phase 9| A7
-    CreatorDriver -.->|Phase 9| A7
+    FixCmd     -.->|Phase 9| A7[jira-commenter]
+    EnhCmd     -.->|Phase 9| A7
+    CreateCmd  -.->|Phase 9| A7
 
     Skill[(data-work-patterns skill)]
     A1 -.references.-> Skill
@@ -282,9 +284,9 @@ flowchart LR
     A5 -.references.-> Skill
     A6 -.references.-> Skill
     A7 -.references.-> Skill
-    Fixer -.references.-> Skill
-    EnhDriver -.references.-> Skill
-    CreatorDriver -.references.-> Skill
+    FixCmd -.references.-> Skill
+    EnhCmd -.references.-> Skill
+    CreateCmd -.references.-> Skill
 
     A4 --- MCP_GH[/intuit-github-mcp/]
     A5 --- MCP_DAST[/DAST-Orch/]
@@ -294,9 +296,9 @@ flowchart LR
     A7 --- MCP_JIRA
     A8 --- MCP_JIRA
 
-    style Fixer fill:#cce5ff
-    style EnhDriver fill:#cce5ff
-    style CreatorDriver fill:#cce5ff
+    style FixCmd fill:#cce5ff
+    style EnhCmd fill:#cce5ff
+    style CreateCmd fill:#cce5ff
     style Skill fill:#d4edda
     style InlinePlan fill:#fff4cc
 ```
@@ -323,18 +325,18 @@ The root `marketplace.json` points at `data-forge/` via a relative `source` (`".
 
 ## Architecture
 
-Two pieces, working together:
+Three pieces, working together:
 
-### Agents (`data-forge/agents/`)
-Isolated workflow executors. Each runs in a fresh conversation context.
+### Slash commands (`data-forge/commands/`)
+Workflow orchestrators. Each runs in the main session and spawns specialist sub-agents via `Agent`.
 
-**Orchestrators (one per workflow):**
+- `/data-forge:data-issue-fix` — fix flow (bug / data anomaly)
+- `/data-forge:data-enhancement` — enhancement flow (change to existing pipeline)
+- `/data-forge:data-creator` — create flow (net-new pipeline)
+- `/data-forge:dispatch` — top-level router that asks for the workflow when not specified
 
-- `data-issue-fixer` — fix flow (bug / data anomaly)
-- `data-enhancement-driver` — enhancement flow (change to existing pipeline)
-- `data-creator-driver` — create flow (net-new pipeline)
-
-**Shared sub-agents (used by all three orchestrators):**
+### Specialist sub-agents (`data-forge/agents/`)
+Isolated workers. Each runs in a fresh conversation context, owns a scoped piece of the workflow, and is reused across all three commands.
 
 - `data-work-intake` — reads a Jira ticket + comments (or a freeform spec for create flow)
 - `data-issue-diagnoser` — root-cause analysis (fix flow only)
@@ -346,13 +348,13 @@ Isolated workflow executors. Each runs in a fresh conversation context.
 - `incident-scribe` — structures raw incident reports (used by fix flow's Phase 1 fallback)
 
 ### Skill (`data-forge/skills/data-work-patterns/`)
-Shared reference library the agents delegate to — diagnostic and change-planning methods, comment templates, plan templates, mode-aware SQL skeletons, guardrails. Updates here propagate to all agents without editing agent files. Referenced inside agent prompts as `${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/...` (where `${CLAUDE_PLUGIN_ROOT}` resolves to `data-forge/`).
+Shared reference library that commands and agents delegate to — diagnostic and change-planning methods, comment templates, plan templates, mode-aware SQL skeletons, guardrails. Updates here propagate to every command and agent without editing prompts. Referenced inside command and agent prompts as `${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/...` (where `${CLAUDE_PLUGIN_ROOT}` resolves to `data-forge/`).
 
 ```
 data-work-patterns/
 ├── SKILL.md
 ├── refs/
-│   ├── mcp-prerequisites.md      ← Phase 0 fail-fast MCP-registered check (all orchestrators)
+│   ├── mcp-prerequisites.md      ← Phase 0 fail-fast MCP-registered check (all workflow commands)
 │   ├── partition-guidance.md     ← mandatory partition-pruning routine before broad SQL (diagnoser & validator)
 │   ├── diagnostic-method.md      ← rule-out pattern (fix flow)
 │   ├── change-plan-method.md     ← scope-and-plan pattern (enhancement & create)
@@ -376,11 +378,10 @@ data-work-patterns/
 
 ## Roster summary
 
+Workflow commands (in `data-forge/commands/`) run in the main session and inherit its tool surface; they spawn the agents below via `Agent`. Agents (in `data-forge/agents/`) have explicit `tools:` declarations.
+
 | Agent | Tools | Writes? |
 | --- | --- | --- |
-| `data-issue-fixer` (fix orchestrator) | Agent + full | yes (via sub-agents) |
-| `data-enhancement-driver` (enhancement orchestrator) | Agent + full | yes (via sub-agents) |
-| `data-creator-driver` (create orchestrator) | Agent + full | yes (via sub-agents) |
 | `data-work-intake` | Read, Grep, Glob | no |
 | `data-issue-diagnoser` | Read, Grep, Glob, Bash | no |
 | `data-pipeline-coder` | Read, Edit, Write, Grep, Glob, Bash | edits/creates files, no commit |
@@ -407,9 +408,9 @@ Per workflow:
 
 | Workflow | Checkpoints |
 | --- | --- |
-| **fix** (`data-issue-fixer`) | 1. Post-diagnosis<br>2. Pre-commit (diff review)<br>3. Post-PRF (acceptance to proceed to PRD) |
-| **enhancement** (`data-enhancement-driver`) | 1. Pre-commit (diff against approved plan)<br>2. Post-PRF (acceptance criteria pass) |
-| **create** (`data-creator-driver`) | 1. Pre-commit (scaffold review)<br>2. Post-PRF (first-run-healthy pass) |
+| **fix** (`/data-forge:data-issue-fix`) | 1. Post-diagnosis<br>2. Pre-commit (diff review)<br>3. Post-PRF (acceptance to proceed to PRD) |
+| **enhancement** (`/data-forge:data-enhancement`) | 1. Pre-commit (diff against approved plan)<br>2. Post-PRF (acceptance criteria pass) |
+| **create** (`/data-forge:data-creator`) | 1. Pre-commit (scaffold review)<br>2. Post-PRF (first-run-healthy pass) |
 
 In the enhancement and create flows, the Phase 2 plan (change plan / scaffold plan) is **reviewed inline during Phase 2** — not as a separate post-plan checkpoint — so the engineer can refine/approve/stop without an explicit gate ceremony.
 
@@ -417,14 +418,14 @@ All checkpoints default-ON. "Skip checkpoint" is honored when the engineer is ex
 
 ## Project context
 
-The orchestrator reads `CLAUDE.md` (project root, parent dirs, `~/CLAUDE.md`) for conventions — Jira project key, catalog names, ETL script patterns. **No cross-session memory** — each run re-reads rather than recalling.
+Each workflow command reads `CLAUDE.md` (project root, parent dirs, `~/CLAUDE.md`) for conventions — Jira project key, catalog names, ETL script patterns. **No cross-session memory** — each run re-reads rather than recalling.
 
 ## Extending
 
 - **New diagnostic pattern?** Add to `data-forge/skills/data-work-patterns/refs/worked-examples.md`. One case study per section; keep Situation / Insight / Lesson structure.
 - **New Jira comment template?** Add to `data-forge/skills/data-work-patterns/templates/` and update `jira-commenter`'s template pointer list.
 - **New verification check?** Add to the matching section (A / B / C) of `data-forge/skills/data-work-patterns/sql/verification-queries.sql` and mention it in `refs/diagnostic-method.md` (fix) or `refs/change-plan-method.md` (enhancement / create).
-- **New workflow?** Add a new orchestrator in `agents/`, a matching command in `commands/`, a Phase 2 plan template in `templates/`, and a new section in `sql/verification-queries.sql` if the workflow needs its own check set. The validator and coder both accept new modes via their `mode` parameter — no code edits needed for the shared sub-agents.
+- **New workflow?** Add a new slash command in `commands/` (the workflow command IS the orchestrator — there is no separate orchestrator agent), a Phase 2 plan template in `templates/`, and a new section in `sql/verification-queries.sql` if the workflow needs its own check set. The validator and coder both accept new modes via their `mode` parameter — no code edits needed for the shared sub-agents.
 - **New repo?** Ensure it has a `CLAUDE.md` describing its conventions and that its data warehouse MCP is connectable. No agent code changes required.
 
 ## Example session — fix flow
@@ -511,11 +512,12 @@ PRF validated, PRD pipeline succeeded. NULL% baseline restored in stable.
 
 ## Why this layout
 
-- **Agents** run in isolated contexts → each orchestrator's context doesn't balloon.
-- **Three orchestrators, one shared roster** → workflows differ only where they actually differ (intake framing, Phase 2 method, validator mode); the rest is shared code.
-- **Skill** is the single source of truth for shared patterns → update in one place, all agents benefit. Adding a new workflow means adding one orchestrator + one command + one Phase 2 template + one SQL section, not duplicating the roster.
+- **Workflow command IS the orchestrator** → slash commands run in the main session, so they can spawn specialist sub-agents via `Agent`. An "orchestrator agent" pattern doesn't work in Claude Code — sub-agents cannot spawn other sub-agents.
+- **Agents** run in isolated contexts → each specialist's context doesn't balloon.
+- **Three commands, one shared roster** → workflows differ only where they actually differ (intake framing, Phase 2 method, validator mode); the rest is shared code.
+- **Skill** is the single source of truth for shared patterns → update in one place, all commands and agents benefit. Adding a new workflow means adding one slash command + one Phase 2 template + one SQL section, not duplicating the roster.
 - **`mode` parameter on coder and validator** → behavior switches per workflow without forking the agents. Adding a fourth workflow later just means another mode value.
-- **Templates** as separate files → easier to version, easier for engineers to tweak without agent prompt edits.
+- **Templates** as separate files → easier to version, easier for engineers to tweak without prompt edits.
 - **SQL skeletons** in their own file → can be copy-pasted into a Databricks notebook for ad-hoc investigation.
 - **Worked examples** as a growing file → the system learns over time as patterns are added.
 - **Plugin nested under `data-forge/`** → the `intuit-de` marketplace can ship additional plugins as sibling directories without restructuring.

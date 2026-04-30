@@ -147,4 +147,4 @@ If the status is unclear, report verbatim what you got and ask the engineer how 
 
 ## Standalone invocation
 
-If invoked directly (not from `data-issue-fixer`), go through the same flow. Always end with the "Suggested next step" line so the engineer knows how to continue the cycle.
+If invoked directly (not from a workflow command like `/data-forge:data-issue-fix`), go through the same flow. Always end with the "Suggested next step" line so the engineer knows how to continue the cycle.

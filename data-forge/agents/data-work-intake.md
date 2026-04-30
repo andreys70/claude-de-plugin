@@ -103,6 +103,6 @@ For each engineer comment in chronological order:
 After producing the report, end with one line based on the workflow hint or your inference:
 
 - **Bug / data anomaly:** > **Suggested next step:** Invoke `data-issue-diagnoser` with this intake report to begin root-cause analysis.
-- **Enhancement / optimization / ad-hoc change:** > **Suggested next step:** Hand this intake report to `data-enhancement-driver`'s Phase 2 (scope & change plan).
-- **Net-new pipeline:** > **Suggested next step:** Hand this intake report to `data-creator-driver`'s Phase 2 (scaffold plan).
-- **Unclear:** > **Suggested next step:** Workflow is unclear — clarify with engineer: bug fix (→ `data-issue-fixer`), enhancement (→ `data-enhancement-driver`), or net-new pipeline (→ `data-creator-driver`).
+- **Enhancement / optimization / ad-hoc change:** > **Suggested next step:** Hand this intake report back to the `/data-forge:data-enhancement` workflow for its Phase 2 (scope & change plan).
+- **Net-new pipeline:** > **Suggested next step:** Hand this intake report back to the `/data-forge:data-creator` workflow for its Phase 2 (scaffold plan).
+- **Unclear:** > **Suggested next step:** Workflow is unclear — clarify with engineer: bug fix (→ `/data-forge:data-issue-fix`), enhancement (→ `/data-forge:data-enhancement`), or net-new pipeline (→ `/data-forge:data-creator`).

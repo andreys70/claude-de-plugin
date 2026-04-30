@@ -1,6 +1,6 @@
 ---
 name: data-work-patterns
-description: Shared reference for the data-forge agent family across all three workflows (fix, enhancement, create) — diagnostic and change-planning methods, Jira comment templates, and reusable SQL skeletons for verification. The data-issue-fixer, data-enhancement-driver, data-creator-driver, data-issue-diagnoser, data-validator, data-pipeline-coder, data-work-intake, and jira-commenter agents all delegate here for shared patterns.
+description: Shared reference for the data-forge plugin across all three workflows (fix, enhancement, create) — diagnostic and change-planning methods, Jira comment templates, and reusable SQL skeletons for verification. The three workflow commands (/data-forge:data-issue-fix, /data-forge:data-enhancement, /data-forge:data-creator) and all eight specialist sub-agents (data-issue-diagnoser, data-validator, data-pipeline-coder, data-work-intake, jira-commenter, bpp-pipeline-runner, git-release-agent, incident-scribe) delegate here for shared patterns.
 ---
 
 # Data Work Patterns — shared reference
@@ -42,7 +42,7 @@ data-work-patterns/
 - **`data-pipeline-coder`** → `refs/guardrails.md` (what you must NOT do). For `mode: enhancement`, read `refs/change-plan-method.md` first. For `mode: scaffold`, read `templates/scaffold-plan.md` for the expected plan shape.
 - **`data-validator`** → `refs/partition-guidance.md` (mandatory before broad SQL) + `sql/verification-queries.sql` (pick the section matching the check-set mode) + `templates/validation-report.md`.
 - **`jira-commenter`** → `templates/jira-*-comment.md`. Always check the engineer's personal CR memory first (`~/.claude/projects/*/memory/feedback_cr_format.md`) — if present, it supersedes `templates/jira-cr-format.md`.
-- **Orchestrators** (`data-issue-fixer`, `data-enhancement-driver`, `data-creator-driver`) → `refs/mcp-prerequisites.md` (Phase 0 fail-fast) + `refs/guardrails.md` (checkpoint and approval rules, workflow-specific notes).
+- **Orchestrators** (`/data-forge:data-issue-fix` command, `/data-forge:data-enhancement` command, `/data-forge:data-creator` command) → `refs/mcp-prerequisites.md` (Phase 0 fail-fast) + `refs/guardrails.md` (checkpoint and approval rules, workflow-specific notes).
 
 ## The diagnostic method — quick reference (fix flow)
 
@@ -74,15 +74,15 @@ Full details in `refs/guardrails.md`. At a glance:
 - **Git commits / pushes / PR creation:** always ask at every step
 - **Verification against un-refreshed data:** refuse
 - **Orchestrator checkpoints:**
-  - **fix flow (`data-issue-fixer`):** post-diagnosis, pre-commit, post-PRF (3, all default-ON)
-  - **enhancement flow (`data-enhancement-driver`):** pre-commit, post-PRF (2, the plan is reviewed inline during Phase 2)
-  - **create flow (`data-creator-driver`):** pre-commit, post-PRF (2, the scaffold plan is reviewed inline during Phase 2)
+  - **fix flow (`/data-forge:data-issue-fix` command):** post-diagnosis, pre-commit, post-PRF (3, all default-ON)
+  - **enhancement flow (`/data-forge:data-enhancement` command):** pre-commit, post-PRF (2, the plan is reviewed inline during Phase 2)
+  - **create flow (`/data-forge:data-creator` command):** pre-commit, post-PRF (2, the scaffold plan is reviewed inline during Phase 2)
 
 ## How to extend
 
 - New diagnostic pattern learned in a case? Add it to `refs/worked-examples.md`. One case study per section; keep the "Situation / Insight / Lesson" structure.
 - New Jira comment style the engineer prefers? Add a new template in `templates/` and update the `jira-commenter` agent's pointer.
 - New verification check that should be standard? Add the SQL skeleton to the matching section of `sql/verification-queries.sql` (A/B/C) and update `refs/diagnostic-method.md` or `refs/change-plan-method.md` accordingly.
-- New workflow (beyond fix/enhancement/create)? Add a new orchestrator in `agents/`, a matching template in `templates/`, and a new section in `sql/verification-queries.sql` if it needs its own check set.
+- New workflow (beyond fix/enhancement/create)? Add a new slash command in `commands/` (the workflow command IS the orchestrator — there is no separate orchestrator agent), a matching template in `templates/`, and a new section in `sql/verification-queries.sql` if it needs its own check set.
 
 Updates here propagate to all agents in the family — no agent file edits needed.

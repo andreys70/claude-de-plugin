@@ -1,6 +1,6 @@
 # MCP prerequisites — Phase 0 fail-fast
 
-This file is the single source of truth for the MCP-registered check that every data-forge orchestrator runs as Phase 0. If you're an orchestrator (`data-issue-fixer`, `data-enhancement-driver`, `data-creator-driver`), follow this exactly.
+This file is the single source of truth for the MCP-registered check that every data-forge workflow command runs as Phase 0. If you're a workflow command (`/data-forge:data-issue-fix`, `/data-forge:data-enhancement`, or `/data-forge:data-creator`), follow this exactly.
 
 ## Required MCPs
 
@@ -15,9 +15,9 @@ The plugin requires four MCPs registered at the user level:
 
 ## Workflow-specific carve-outs
 
-- **fix flow** (`data-issue-fixer`): all four required.
-- **enhancement flow** (`data-enhancement-driver`): all four required.
-- **create flow** (`data-creator-driver`): only the *Jira* MCP is conditional — required when a Jira key was provided, skipped when input is a freeform spec. The other three are required regardless.
+- **fix flow** (`/data-forge:data-issue-fix` command): all four required.
+- **enhancement flow** (`/data-forge:data-enhancement` command): all four required.
+- **create flow** (`/data-forge:data-creator` command): only the *Jira* MCP is conditional — required when a Jira key was provided, skipped when input is a freeform spec. The other three are required regardless.
 
 ## Procedure — toolset inspection only, NO MCP calls
 
