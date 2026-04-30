@@ -48,11 +48,11 @@ Hand the input through verbatim — don't paraphrase or restructure it. The orch
 
 ## Examples
 
-- `/data-forge` — asks for input AND workflow.
-- `/data-forge FIND-742` — asks for workflow only; passes the Jira key to the chosen orchestrator.
-- `/data-forge fix` — asks for input only; routes to fix flow.
-- `/data-forge FIND-742 enhancement` — no prompts; routes directly to enhancement flow with `FIND-742`.
-- `/data-forge "build a daily settlement pipeline" create` — no prompts; routes to create flow with the spec as the input.
+- `/dispatch` — asks for input AND workflow.
+- `/dispatch FIND-742` — asks for workflow only; passes the Jira key to the chosen orchestrator.
+- `/dispatch fix` — asks for input only; routes to fix flow.
+- `/dispatch FIND-742 enhancement` — no prompts; routes directly to enhancement flow with `FIND-742`.
+- `/dispatch "build a daily settlement pipeline" create` — no prompts; routes to create flow with the spec as the input.
 
 ## Note
 

@@ -6,7 +6,7 @@ End-to-end automation for three data-pipeline workflows in ETL codebases:
 - **enhancement** (`/data-enhancement`) — implement a non-bug change against an existing pipeline. Jira intake → scope & change plan → code change → PRF validation → BPP pipeline → post-deploy verification → Jira close-out. **Two checkpoints** (pre-commit, post-PRF). The plan is reviewed inline.
 - **create** (`/data-creator`) — scaffold a net-new pipeline (config, code, or both). Intake (Jira preferred, freeform spec accepted) → scaffold plan → scaffold code → PRF dry-run → first-run verification → BPP pipeline → close-out. **Two checkpoints** (pre-commit, post-PRF). PRF iteration before PRD is expected.
 
-Each workflow has its own orchestrator and command. A top-level `/data-forge` dispatcher prompts for the workflow when it's not specified. All three share the same agent roster (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the orchestrator.
+Each workflow has its own orchestrator and command. A top-level `/dispatch` command prompts for the workflow when it's not specified. All three share the same agent roster (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the orchestrator.
 
 Ships from the `intuit-de` marketplace (this repo), which may grow to host additional data-engineering plugins over time. The plugin itself lives at `data-forge/` inside the repo.
 
@@ -96,9 +96,9 @@ Pick the command that matches the workflow:
 If you're not sure which one, the dispatcher asks:
 
 ```
-/data-forge                                    # asks for input + workflow
-/data-forge JIRA-XXXX                          # asks for workflow only
-/data-forge JIRA-XXXX enhancement              # no prompts
+/dispatch                                      # asks for input + workflow
+/dispatch JIRA-XXXX                            # asks for workflow only
+/dispatch JIRA-XXXX enhancement                # no prompts
 ```
 
 Or invoke any specialist sub-agent directly:
@@ -203,7 +203,7 @@ Three orchestrators (one per workflow) share a common roster of specialist sub-a
 ```mermaid
 flowchart LR
     User([Engineer])
-    User -->|/data-forge dispatcher<br/>or specific command| OrchPick
+    User -->|/dispatch<br/>or specific command| OrchPick
 
     OrchPick{workflow?}
     OrchPick -->|fix| Fixer[data-issue-fixer<br/>orchestrator]
