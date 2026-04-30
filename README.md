@@ -6,7 +6,7 @@ End-to-end automation for three data-pipeline workflows in ETL codebases:
 - **enhancement** (`/data-enhancement`) — implement a non-bug change against an existing pipeline. Jira intake → scope & change plan → code change → PRF validation → BPP pipeline → post-deploy verification → Jira close-out. **Two checkpoints** (pre-commit, post-PRF). The plan is reviewed inline.
 - **create** (`/data-creator`) — scaffold a net-new pipeline (config, code, or both). Intake (Jira preferred, freeform spec accepted) → scaffold plan → scaffold code → PRF dry-run → first-run verification → BPP pipeline → close-out. **Two checkpoints** (pre-commit, post-PRF). PRF iteration before PRD is expected.
 
-Each workflow has its own orchestrator and command. A top-level `/dispatch` command prompts for the workflow when it's not specified. All three share the same agent roster (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the orchestrator.
+Each workflow has its own orchestrator and command. A top-level `/data-forge:dispatch` command prompts for the workflow when it's not specified. All three share the same agent roster (intake, coder, validator, git-release, BPP runner, jira-commenter) — the validator and coder switch behavior based on a `mode` passed by the orchestrator.
 
 Ships from the `intuit-de` marketplace (this repo), which may grow to host additional data-engineering plugins over time. The plugin itself lives at `data-forge/` inside the repo.
 
@@ -58,6 +58,8 @@ When the plugin ships a new version (anyone on the team merges changes to `maste
 /plugin install data-forge@intuit-de
 ```
 
+**Restart Claude Code after the update.** Plugin agents and commands are loaded at session start; updates picked up by `/plugin install` only become active in a fresh session.
+
 ### Uninstall
 
 ```
@@ -96,9 +98,9 @@ Pick the command that matches the workflow:
 If you're not sure which one, the dispatcher asks:
 
 ```
-/dispatch                                      # asks for input + workflow
-/dispatch JIRA-XXXX                            # asks for workflow only
-/dispatch JIRA-XXXX enhancement                # no prompts
+/data-forge:dispatch                           # asks for input + workflow
+/data-forge:dispatch JIRA-XXXX                 # asks for workflow only
+/data-forge:dispatch JIRA-XXXX enhancement     # no prompts
 ```
 
 Or invoke any specialist sub-agent directly:
@@ -108,6 +110,19 @@ Agent(data-forge:data-issue-diagnoser, "why is last_routing_number 97% NULL sinc
 Agent(data-forge:bpp-pipeline-runner, "run pipeline for JIRA-XXXX")
 Agent(data-forge:data-validator, "verify JIRA-XXXX on schema_name.table_name after commit <commit-sha>, mode: anomaly-resolved")
 ```
+
+### Modes (for `data-pipeline-coder` and `data-validator`)
+
+These two sub-agents take a `mode` parameter so the same agent can serve all three workflows. Orchestrators set this automatically; if you invoke either agent standalone, pass the mode that matches the situation:
+
+| Agent | Mode | When to use |
+|---|---|---|
+| `data-pipeline-coder` | `fix` | applying a diagnosis to existing code (bug fix) |
+| `data-pipeline-coder` | `enhancement` | applying an approved change plan to existing code |
+| `data-pipeline-coder` | `scaffold` | creating net-new pipeline files from a scaffold plan |
+| `data-validator` | `anomaly-resolved` | did the named anomaly (NULL%, etc.) actually go away? |
+| `data-validator` | `acceptance-criteria` | does each acceptance criterion from the Jira pass? |
+| `data-validator` | `first-run-healthy` | did the new pipeline produce a healthy first run? (table exists, schema matches, non-zero rows, required cols populated) |
 
 ## Required MCPs
 
@@ -209,7 +224,7 @@ Three orchestrators (one per workflow) share a common roster of specialist sub-a
 ```mermaid
 flowchart LR
     User([Engineer])
-    User -->|/dispatch<br/>or specific command| OrchPick
+    User -->|/data-forge:dispatch<br/>or specific command| OrchPick
 
     OrchPick{workflow?}
     OrchPick -->|fix| Fixer[data-issue-fixer<br/>orchestrator]
