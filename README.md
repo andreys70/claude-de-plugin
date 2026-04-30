@@ -221,6 +221,8 @@ flowchart TD
 
 Three orchestrators (one per workflow) share a common roster of specialist sub-agents. Each orchestrator owns its phase flow; sub-agents own their scoped work and are reused across workflows. The shared `data-work-patterns` skill is the single source of truth for templates, methods, and SQL.
 
+**Orchestrators do not call MCP tools directly** (except for the four cheap Phase 0 probes that verify each MCP is connected). All Jira reads/writes, SQL execution, BPP pipeline runs, and PR creation are delegated to the matching sub-agent. This keeps the orchestrator's tool surface minimal and makes failures attributable to the right specialist.
+
 ```mermaid
 flowchart LR
     User([Engineer])
