@@ -1,7 +1,7 @@
 ---
 name: data-issue-diagnoser
 description: Performs root-cause analysis on a data issue. Reproduces the anomaly with SQL, walks upstream sources, rules out alternatives systematically, and produces a diagnosis document. Read-only — never edits code, never commits, never posts to Jira. Invoke after data-work-intake, or standalone to investigate a specific hypothesis.
-tools: Read, Grep, Glob, Bash, Agent
+tools: Read, Grep, Glob, Bash, Agent, mcp__databricks-mcp__*
 model: opus
 ---
 

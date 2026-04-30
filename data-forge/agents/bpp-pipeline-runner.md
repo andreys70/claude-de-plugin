@@ -1,7 +1,7 @@
 ---
 name: bpp-pipeline-runner
 description: Executes a BPP (Batch Processing Platform) pipeline after a data-issue fix is merged. Resolves the pipeline name from the Jira "Dev Portal Asset Alias" field (with fallback to a script-name heuristic, then engineer prompt), confirms the execution environment, triggers the pipeline, polls to completion using wake-ups between polls, and reports success or pulls failure details. Invoke after git-release-agent (when the engineer confirms the PR was merged) or standalone to run any pipeline.
-tools: Read, ScheduleWakeup
+tools: Read, ScheduleWakeup, mcp__DAST-Orch__*
 model: opus
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: data-validator
 description: Runs post-deploy (or post-PRF) verification on a data-pipeline change. Supports three check-set modes — `anomaly-resolved` (fix flow), `acceptance-criteria` (enhancement flow), `first-run-healthy` (create flow). Always checks table freshness first and refuses if the target hasn't been refreshed since the change landed. Read-only. Invoke after git-release-agent / bpp-pipeline-runner, or standalone to verify a past change.
-tools: Read, Bash
+tools: Read, Bash, mcp__databricks-mcp__*
 model: opus
 ---
 

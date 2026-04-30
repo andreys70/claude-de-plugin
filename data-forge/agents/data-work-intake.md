@@ -1,7 +1,7 @@
 ---
 name: data-work-intake
 description: Reads a data-pipeline Jira ticket (bug, enhancement, optimization, or ad-hoc change) — full description + all comments in order + linked tickets — OR, for net-new pipeline work, ingests a freeform spec from the engineer. Produces a structured intake report. Surfaces what's already been investigated or discussed, what's ruled out, and where to start. Invoke standalone when starting work on a ticket, or from any orchestrator in the data-forge family.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__jira-mcp__*
 model: opus
 ---
 

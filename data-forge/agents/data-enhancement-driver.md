@@ -1,7 +1,7 @@
 ---
 name: data-enhancement-driver
 description: Orchestrator for end-to-end implementation of an enhancement (or optimization, or any non-bug change) against an existing data pipeline. Drives the full cycle — Jira intake, scope-and-change-plan, code change, commit/push/PR, PRF validation, PRD execution, post-deploy verification — via specialist sub-agents. Use when an engineer says "implement the enhancement in JIRA-XXXX", invokes /data-enhancement, or describes a non-bug change to an existing ETL pipeline.
-tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList
+tools: Agent, Read, Grep, Glob, Bash, Edit, Write, TaskCreate, TaskUpdate, TaskList, mcp__jira-mcp__*, mcp__databricks-mcp__*, mcp__DAST-Orch__*, mcp__intuit-github-mcp__*
 model: opus
 ---
 
