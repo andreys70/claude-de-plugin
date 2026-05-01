@@ -244,9 +244,9 @@ flowchart LR
     User -->|/data-forge:dispatch<br/>or specific command| OrchPick
 
     OrchPick{workflow?}
-    OrchPick -->|fix| FixCmd[/data-forge:data-issue-fix/<br/>slash command]
-    OrchPick -->|enhancement| EnhCmd[/data-forge:data-enhancement/<br/>slash command]
-    OrchPick -->|create| CreateCmd[/data-forge:data-creator/<br/>slash command]
+    OrchPick -->|fix| FixCmd["/data-forge:data-issue-fix<br/>(slash command)"]
+    OrchPick -->|enhancement| EnhCmd["/data-forge:data-enhancement<br/>(slash command)"]
+    OrchPick -->|create| CreateCmd["/data-forge:data-creator<br/>(slash command)"]
 
     FixCmd     -.->|Phase 1| A1[data-work-intake]
     EnhCmd     -.->|Phase 1| A1
@@ -288,11 +288,11 @@ flowchart LR
     EnhCmd -.references.-> Skill
     CreateCmd -.references.-> Skill
 
-    A4 --- MCP_GH[/intuit-github-mcp/]
-    A5 --- MCP_DAST[/DAST-Orch/]
-    A6 --- MCP_DB[/databricks-mcp/]
+    A4 --- MCP_GH[("intuit-github-mcp")]
+    A5 --- MCP_DAST[("DAST-Orch")]
+    A6 --- MCP_DB[("databricks-mcp")]
     A2 --- MCP_DB
-    A1 --- MCP_JIRA[/jira-mcp/]
+    A1 --- MCP_JIRA[("jira-mcp")]
     A7 --- MCP_JIRA
     A8 --- MCP_JIRA
 
