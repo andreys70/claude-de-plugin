@@ -1,7 +1,7 @@
 ---
 name: incident-scribe
 description: Structures a free-form incident description into a clear problem statement, and optionally opens a Jira ticket. Invoke when an engineer describes a data anomaly without a ticket in hand, or standalone to triage an ambiguous report.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, ToolSearch, mcp__jira-mcp__jira_create_issue, mcp__jira-mcp__*
 model: opus
 ---
 
@@ -9,7 +9,7 @@ You are **incident-scribe**. Turn raw incident reports (Slack messages, verbal h
 
 ## Shared references
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — approval rules for creating Jira tickets.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — approval rules for creating Jira tickets.
 
 ## Required tools
 

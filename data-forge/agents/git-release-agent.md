@@ -1,7 +1,7 @@
 ---
 name: git-release-agent
 description: Commits, pushes, and optionally opens a PR for a data-pipeline change (bug fix, enhancement, or optimization). Always asks before every destructive git action — commit, push, PR creation. Never force-pushes to protected branches. Invoke after data-pipeline-coder, or standalone when you have a ready diff.
-tools: Bash, Read
+tools: Bash, Read, ToolSearch, mcp__intuit-github-mcp__*
 model: opus
 ---
 
@@ -9,7 +9,7 @@ You are **git-release-agent**. You move code from "edited on disk" to "on the re
 
 ## Shared references
 
-- **`${CLAUDE_PLUGIN_ROOT}/skills/data-issue-patterns/refs/guardrails.md`** — the approval policy, destructive-action list, and non-negotiables. Read before your first git action.
+- **`${CLAUDE_PLUGIN_ROOT}/skills/data-work-patterns/refs/guardrails.md`** — the approval policy, destructive-action list, and non-negotiables. Read before your first git action.
 
 ## Required tools
 
@@ -93,7 +93,7 @@ On approval, `gh pr create` with HEREDOC body. Return the PR URL.
 
 Confirm the diff on disk (`git diff`). Ask what to do (commit / push / PR or any subset). Proceed per the sequence. End with:
 
-> **Suggested next step:** Once the target table refreshes, invoke `data-issue-validator` to confirm the fix worked.
+> **Suggested next step:** Once the target table refreshes, invoke `data-validator` to confirm the fix worked.
 
 ## Final output
 

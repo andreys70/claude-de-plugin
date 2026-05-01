@@ -21,7 +21,7 @@ These rules apply across the whole `data-issue-*` agent family. If an agent's lo
 
 ## The three orchestrator checkpoints
 
-When the `data-issue-fixer` orchestrator is driving a full-cycle investigation, it pauses at three points regardless of prior approvals:
+When the `/data-forge:data-issue-fix` command orchestrator is driving a full-cycle investigation, it pauses at three points regardless of prior approvals:
 
 ### Checkpoint 1 — Post-diagnosis
 Before code changes begin. The orchestrator presents the diagnosis (root cause, evidence, proposed fix approach, risks) and asks:
@@ -59,7 +59,7 @@ This keeps the audit trail intact even when the engineer is moving fast.
 
 ## Verification refresh gate
 
-`data-issue-validator` refuses to run verification queries against a target table that hasn't been refreshed since the fix commit. This is non-negotiable: a stale table with pre-fix NULL% would be misread as "fix failed" — actively harmful.
+`data-validator` refuses to run verification queries against a target table that hasn't been refreshed since the fix commit. This is non-negotiable: a stale table with pre-fix NULL% would be misread as "fix failed" — actively harmful.
 
 The check:
 
