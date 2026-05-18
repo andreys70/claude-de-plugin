@@ -9,6 +9,11 @@
       "name": "data-forge",
       "source": "./data-forge",
       "description": "End-to-end data-issue resolution for ETL codebases: Jira intake, diagnosis, code fix, PRF validation, BPP pipeline execution, post-deploy verification."
+    },
+    {
+      "name": "auditpath",
+      "source": "./auditpath",
+      "description": "End-to-end SOX pipeline onboarding: JIRA intake, source analysis, DM + DQ conf generation, BPP registration, unit testing, SOX completeness/accuracy validation, and JIRA close-out. Domain-agnostic — works for QBC, Loss Reserve, Capital, or any future domain."
     }
   ]
 }
