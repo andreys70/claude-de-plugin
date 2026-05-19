@@ -14,6 +14,11 @@
       "name": "auditpath",
       "source": "./auditpath",
       "description": "End-to-end SOX pipeline onboarding: JIRA intake, source analysis, DM + DQ conf generation, BPP registration, unit testing, SOX completeness/accuracy validation, and JIRA close-out. Domain-agnostic — works for QBC, Loss Reserve, Capital, or any future domain."
+    },
+    {
+      "name": "pii-minimization",
+      "source": "./pii-minimization",
+      "description": "End-to-end IDPS encryption rollout: Phase 1 decrypt-on-read and Phase 2 encrypt-on-write across RDA BPP, QuickETL, SPP, Report Requestor, and Quickbase pipelines. Includes Redshift column widening gate before Phase 2."
     }
   ]
 }
