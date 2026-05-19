@@ -1,0 +1,198 @@
+## Schema → Job Type Registry
+## Self-contained in the pii-minimization plugin — no external file reference needed.
+## Used by phase1.md, phase2.md, and redshift-widen.md to dispatch to the correct agent.
+##
+## PII Inventory Google Sheet (authoritative source for SENSITIVE columns and pipeline metadata):
+##   Base URL: https://docs.google.com/spreadsheets/d/1tRCokJ8n__Juw4IG3tI1LfmybxN25y1d/edit
+##
+##   Tabs:
+##     gid=2018349118  — 📋 Execution Overview        (rollout plan, dates, schema counts)
+##     gid=1687383891  — 📊 Table-Level PII Detail     (SENSITIVE columns per schema.table — PRIMARY SOURCE)
+##     gid=0           — redshift-datalake mapping     (DL→RS schema/table/column name mapping)
+##     gid=1716830622  — BPP Prf jobs                  (PRF pipeline names + pipeline_devportal_url)
+##     gid=769537233   — BPP Prod pipelines            (PRD pipeline names + pipeline_devportal_url)
+##     gid=<N>         — 📋 Table Action Summary       (per-table action: ENCRYPT/DROP)
+##     gid=<N>         — 🔐 Schema Encryption Tracker  (per-schema Phase 1/2 deploy status)
+##     gid=<N>         — 🔓 Decryption Tracker         (consumer decrypt deploy status)
+##     gid=<N>         — 🎯 Milestones & Risks         (key dates and risk log)
+##     gid=<N>         — 📅 Non-Working Days           (holidays excluded from scheduling)
+##     gid=<N>         — 📢 Communication Plan         (customer comms schedule)
+##
+## Agents MUST use gid=1687383891 to look up SENSITIVE columns — never hardcode or guess.
+##
+## pipeline values:
+##   rda_bpp          → RDA-framework BPP job (PySpark on EMR)
+##   quicketl         → QuickETL-framework BPP job (YAML config + Hive DDL)
+##   spp              → SPP platform stream processor (Kafka consumer)
+##   report_requestor → Pure Python scripts (Redshift / application-level decrypt)
+##   quickbase        → Aurora RDA extract job + QuickETL transform job (composite)
+##
+## github_repo: full GitHub URL of the repo the agent searches to find pipelines and create PRs against.
+##   Format: https://github.intuit.com/<org>/<repo>
+##   The agent extracts the owner/repo portion and uses GitHub MCP search_code scoped to that repo.
+##   job_path has been removed; the agent discovers job files within the repo via search_code.
+##
+## DROP-TABLE schemas are listed at the bottom — no Phase 1 or Phase 2 work needed.
+
+# ── SPP ─────────────────────────────────────────────────────────────────────
+risk_enrichment_src:
+  pipeline: spp
+  github_repo: https://github.intuit.com/spp-data-risk-moneymovemnt   # agent searches this repo for pipeline jobs
+  tables: 34
+  pii_cols: 96
+  batch: "Phase 4 – SPP"
+
+# ── RDA BPP — Batch A ────────────────────────────────────────────────────────
+risk_mtlmart_dm:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-MTLMart-v2   # agent searches this repo for pipeline jobs
+  tables: 13
+  pii_cols: 73
+  batch: "Phase 6 – Batch A"
+  special_handling: drop_and_reload  # see PRD Section 3.4.1
+
+risk_zoot_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Zoot
+  tables: 10
+  pii_cols: 46
+  batch: "Phase 6 – Batch A"
+
+risk_history_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-History
+  tables: 5
+  pii_cols: 19
+  batch: "Phase 6 – Batch A"
+
+# ── RDA BPP — Batch B ────────────────────────────────────────────────────────
+risk_analytics_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Analytics   # agent searches this repo for pipeline jobs
+  tables: 33
+  pii_cols: 145
+  batch: "Phase 6 – Batch B"
+  note: "Also written by SPP path — SPP Phase 4 covers SPP writes; this entry covers BPP writes only"
+
+# ── RDA BPP — Batch C ────────────────────────────────────────────────────────
+fraud_360_stg_7216:
+  pipeline: rda_bpp
+  github_repo: bpp-data-risk-moneyMovement
+  tables: 2
+  pii_cols: 27
+  batch: "Phase 6 – Batch C"
+
+risk_360_stable:
+  pipeline: quicketl
+  github_repo: https://github.intuit.com/data-fraud-360/fraud-360-quick-etl-pipeline-configs
+  tables: 23
+  pii_cols: 119
+  batch: "Phase 6 – Batch C"
+
+risk_360_stg:
+  pipeline: quicketl
+  github_repo: bpp-data-risk360-moneyMovement
+  tables: 2
+  pii_cols: 4
+  batch: "Phase 6 – Batch C"
+
+risk_iboss_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-iboss
+  tables: 10
+  pii_cols: 43
+  batch: "Phase 6 – Batch C"
+
+# ── RDA BPP — Batch D ────────────────────────────────────────────────────────
+risk_lax_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-LAX
+  tables: 8
+  pii_cols: 17
+  batch: "Phase 6 – Batch D"
+
+risk_apps_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Apps
+  tables: 2
+  pii_cols: 19
+  batch: "Phase 6 – Batch D"
+
+risk_reporting_rpt:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Reporting
+  tables: 5
+  pii_cols: 36
+  batch: "Phase 6 – Batch D"
+
+risk_collections_rpt:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Collections
+  tables: 3
+  pii_cols: 6
+  batch: "Phase 6 – Batch D"
+
+risk_wallet_src:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-Wallet
+  tables: 3
+  pii_cols: 7
+  batch: "Phase 6 – Batch D"
+
+risk_posneg_stable:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/RiskDataAnalytics/ETL-posneg
+  tables: 1
+  pii_cols: 1
+  batch: "Phase 6 – Batch D"
+
+finance_mm_dm:
+  pipeline: rda_bpp
+  github_repo: https://github.intuit.com/data-finance/quick-etl-pipeline-configs
+  tables: 2
+  pii_cols: 9
+  batch: "Phase 6 – Batch D"
+
+risk_mtlmart_dm_prf:
+  pipeline: rda_bpp
+  github_repo: bpp-data-compliance-moneyMovement
+  tables: 3
+  pii_cols: 24
+  batch: "Phase 6 – Batch A"
+
+risk_reporting_rpt_prf:
+  pipeline: rda_bpp
+  github_repo: bpp-data-risk-moneyMovement
+  tables: 1
+  pii_cols: 4
+  batch: "Phase 6 – Batch D"
+
+# ── QuickBase (RDA extract + QuickETL transform) — Batch E ───────────────────
+risk_quickbase_src:
+  pipeline: quickbase
+  github_repo: bpp-data-risk-extract   # agent searches this repo for extract + transform jobs
+  quicketl_config_path: quicketl/risk_quickbase_src/{table}.yaml
+  stage_s3_path: s3://datalake/stage/risk_quickbase_src/{table}/dt={run_date}/
+  final_s3_path: s3://datalake/risk_quickbase_src/{table}/dt={run_date}/
+  tables: 44
+  pii_cols: 279
+  batch: "Phase 6 – Batch E"
+  note: "LARGEST batch — 44 tables. Stage S3 cleanup required after each successful BPP run."
+
+# ── Report Requestor ─────────────────────────────────────────────────────────
+report_requestor:
+  pipeline: report_requestor
+  github_repo: AWS-Pandas-Reports   # agent searches this repo; strips r_ prefix from Jira script names
+  tables: 224
+  pii_cols: 1057
+  deploy_window: "Must be live BEFORE each schema batch encryption goes live"
+
+# ── DROP-TABLE schemas (no Phase 1 or Phase 2 work — PURGE only) ─────────────
+_drop_table_schemas:
+  - risk_enrichment_src_prf    # 6 tables, 11 cols
+  - risk_analytics_stable_prf  # 1 table, 4 cols
+  - risk_history_stable_prf    # 1 table, 5 cols
+  - risk_collections_rpt_prf   # 1 table, 2 cols
+  - sandbox_risk_360_stable    # 2 tables, 9 cols
+  - finance_mm_sandbox         # DROP
+  - sandbox_finance_dm         # DROP
